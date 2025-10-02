@@ -3,6 +3,5 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 pydantic
-pydantic[email]
 python-jose[cryptography]>=3.3.0
 passlib

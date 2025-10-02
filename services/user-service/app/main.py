@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel 
-from app.requests import UserLoginRequest, UserRegisterRequest
+from app.requests import *
 from app.dbClasses import UserCredentials
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
@@ -31,7 +31,7 @@ def login(user: UserLoginRequest, db: Session = Depends(open_db)):
       
     db_user = db.query(UserCredentials).filter(UserCredentials.username == user.username).first()
 
-    if(not user or not verify_password(user.password, db_user.password)):
+    if(not db_user or not verify_password(user.password, db_user.password)):
         return {"error": "Invalid username or password"}
         
         
@@ -40,6 +40,12 @@ def login(user: UserLoginRequest, db: Session = Depends(open_db)):
 
 @app.post("/register")
 def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
+    db_user = db.query(UserCredentials).filter(UserCredentials.username == request.username).first()
+
+    if(db_user and db_user.username):
+        return {"message" : f"User {request.username} already registered"};
+    
+
     register_user = UserCredentials(
         username=request.username,
         password=hash_password(request.password)
