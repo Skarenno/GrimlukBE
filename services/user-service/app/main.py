@@ -1,5 +1,4 @@
-from fastapi import FastAPI, Depends
-from pydantic import BaseModel 
+from fastapi import FastAPI, APIRouter, Depends
 from app.requests import *
 from app.dbClasses import UserCredentials
 from sqlalchemy import create_engine, text
@@ -8,6 +7,7 @@ import os
 from app.authentication import hash_password, verify_password, create_access_token
 
 app = FastAPI()
+user_router = APIRouter(prefix="/user")
 
 DB_URL = os.getenv("DATABASE_URL")
 db_engine = create_engine(DB_URL)
@@ -26,7 +26,7 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.post("/login")
+@user_router.post("/login")
 def login(user: UserLoginRequest, db: Session = Depends(open_db)):
       
     db_user = db.query(UserCredentials).filter(UserCredentials.username == user.username).first()
@@ -38,7 +38,7 @@ def login(user: UserLoginRequest, db: Session = Depends(open_db)):
         
     return {"message": f"User {user.username} logged in successfully"}
 
-@app.post("/register")
+@user_router.post("/register")
 def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
     db_user = db.query(UserCredentials).filter(UserCredentials.username == request.username).first()
 
@@ -55,3 +55,6 @@ def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
     db.commit()
     db.refresh(register_user) 
     return {"status": "ok"}
+
+
+app.include_router(user_router) 
