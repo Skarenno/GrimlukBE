@@ -8,6 +8,8 @@ services:
       - "8001:8000"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/userdb
+      - JWT_KEY=ilbuiooltrelasiepe
+      - JWT_ISSUER=grimluk-finance.com
     depends_on:
       - db
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 from fastapi import HTTPException, status
 import re
 import logging
@@ -69,11 +69,17 @@ class UserRegisterRequest(BaseModel):
         return password
 
 
+class UserInfoRequest(BaseModel) : 
+    name : str
+    surname: str
+
+
 def validateBody(cls, body:dict):
     allowed_keys = cls.model_fields.keys()
 
     logger.info(allowed_keys)
-    for attribute in body.keys:
+    logger.info(body)
+    for attribute in body.keys():
         logger.info(f"attribute: {attribute}")
         if not attribute in allowed_keys:
             raise HTTPException(

@@ -1,10 +1,13 @@
-from fastapi import FastAPI, APIRouter, Depends
+import os
+from fastapi import FastAPI, APIRouter, Request, Depends
+from fastapi.responses import JSONResponse
 from app.requests import *
 from app.dbClasses import UserCredentials
-from sqlalchemy import create_engine, text
+from app.authentication import hash_password, verify_password, generate_jwt, verify_JWT 
+from jose import JWTError
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
-import os
-from app.authentication import hash_password, verify_password, create_access_token
+
 
 app = FastAPI()
 user_router = APIRouter(prefix="/user")
@@ -25,21 +28,20 @@ def open_db():
 def health_check():
     return {"status": "ok"}
 
-
 @user_router.post("/login")
-def login(user: UserLoginRequest, db: Session = Depends(open_db)):
+async def login(user: UserLoginRequest, db: Session = Depends(open_db)):
       
     db_user = db.query(UserCredentials).filter(UserCredentials.username == user.username).first()
 
     if(not db_user or not verify_password(user.password, db_user.password)):
         return {"error": "Invalid username or password"}
         
+    jwt_token = generate_jwt(username=db_user.username)
         
-        
-    return {"message": f"User {user.username} logged in successfully"}
+    return {"token" : jwt_token, "message": f"User {user.username} logged in successfully"}
 
 @user_router.post("/register")
-def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
+async def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
     db_user = db.query(UserCredentials).filter(UserCredentials.username == request.username).first()
 
     if(db_user and db_user.username):
@@ -55,6 +57,38 @@ def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
     db.commit()
     db.refresh(register_user) 
     return {"status": "ok"}
+
+@user_router.post("/user_info")
+async def write_user_info(request: UserInfoRequest, db: Session = Depends(open_db)):
+    return 1
+
+
+@app.middleware('http')
+async def middleware(request: Request, call_next):
+    free_paths = ["/user/login", "/user/register"]
+
+    
+    if(not request.url.path in free_paths):
+        try:
+            verify_JWT(request)
+        except JWTError:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content= {"detail" : "Token is not valid"}
+            )
+        except:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content= {"detail" : "Error while decoding token"}
+            )
+    
+    try:
+        return await call_next(request)
+    except Exception as e:
+        print("Unexpected error:", e)
+        
+        
+
 
 
 app.include_router(user_router) 
