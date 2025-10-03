@@ -12,6 +12,8 @@ class UserLoginRequest(BaseModel):
 
     @model_validator(mode='before')
     def validateUserRegisterRequest(cls, user: dict):
+        validateBody(cls, user)
+
         if(not user["username"] or user["username"].strip() == ""):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -27,6 +29,8 @@ class UserRegisterRequest(BaseModel):
 
     @model_validator(mode='before')
     def validateUserRegisterRequest(cls, user: dict):
+        validateBody(cls, user)
+
         if(not user["username"] or user["username"].strip() == "" or not user["email"] or user["email"].strip() == ""):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -63,4 +67,16 @@ class UserRegisterRequest(BaseModel):
             )
 
         return password
-        
+
+
+def validateBody(cls, body:dict):
+    allowed_keys = cls.model_fields.keys()
+
+    logger.info(allowed_keys)
+    for attribute in body.keys:
+        logger.info(f"attribute: {attribute}")
+        if not attribute in allowed_keys:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username cannot be empty"
+            )
