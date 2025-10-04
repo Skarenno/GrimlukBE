@@ -100,7 +100,7 @@ async def middleware(request: Request, call_next):
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content= {"detail" : "Unexpected error - " str(e)}
+            content= {"detail" : "Unexpected error - " + str(e)}
         )
         
         
