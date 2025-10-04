@@ -84,10 +84,10 @@ async def middleware(request: Request, call_next):
     if(not request.url.path in free_paths):
         try:
             verify_JWT(request)
-        except JWTError:
+        except JWTError as je:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : "Token is not valid"}
+                content= {"detail" : "Token is not valid - " + str(je)}
             )
         except:
             return JSONResponse(
@@ -98,7 +98,10 @@ async def middleware(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as e:
-        print("Unexpected error:", e)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content= {"detail" : "Unexpected error - " str(e)}
+        )
         
         
 
