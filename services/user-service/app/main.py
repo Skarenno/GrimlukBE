@@ -3,7 +3,8 @@ from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
 from app.models.request_models import *
 from app.services.user_service import *
-from app.utils.authentication import verify_JWT 
+from app.utils.authentication import verify_JWT, check_jwt_user_auth 
+from app.exceptions.authentication_exception import *
 from jose import JWTError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -63,17 +64,25 @@ async def register(register_request: UserRegisterRequest, db: Session = Depends(
         )
 
 @user_router.post("/update_user_info")
-async def update_user_info(update_user_request: UserInfoRequest, db: Session = Depends(open_db)):
+async def update_user_info(update_user_request: UserInfoRequest, request:Request, db: Session = Depends(open_db)):
     try:
+        check_jwt_user_auth(request.state.user, update_user_request.username)
         update_user_info_service(update_user_request, db)
     except UserDoesNotExistError:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
              content={"detail":f"User {update_user_request.username} not found"}
         )
+    except JwtPermissionError:
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"detail" : "Authorization error: cannot update other users"}
+        )
 
-
-    return 1
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"detail" : f"{update_user_request.username} updated correctly"}
+    )
 
 
 @app.middleware('http')
@@ -83,7 +92,8 @@ async def middleware(request: Request, call_next):
     
     if(not request.url.path in free_paths):
         try:
-            verify_JWT(request)
+            jwt_payload = verify_JWT(request)
+            request.state.user = jwt_payload
         except JWTError as je:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import Request
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from app.exceptions.authentication_exception import JwtPermissionError
 import os
 
 SECRET_KEY = os.getenv("JWT_KEY")
@@ -21,7 +22,7 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 def generate_jwt(username: str):
     user_data = {
-        "user" : username,
+        "sub" : username,
         "iss" : ISSUER
     }
     return create_access_token(user_data)
@@ -46,3 +47,8 @@ def verify_JWT(request: Request):
     request.state.user = jwt_payload
 
     return jwt_payload
+
+def check_jwt_user_auth(jwt_payload:dict, username:str):
+    user = jwt_payload.get("sub")
+    if (user != username):
+        raise JwtPermissionError
