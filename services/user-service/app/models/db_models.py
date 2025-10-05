@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, func 
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import Column, String, DateTime, ForeignKey, TIMESTAMP, BOOLEAN, Integer, func 
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -29,3 +29,11 @@ class UserModel(Base):
     province = Column(String(2), nullable=False)
 
 
+class UserAccessLogModel(Base):
+    __tablename__ = "access_log"
+
+    id=Column(Integer, primary_key=True, index=True,nullable=False,autoincrement=True)
+    username = Column(String, nullable=False)
+    access_timestamp = Column(TIMESTAMP, server_default=func.now(), nullable=False)
+    ip_address = Column(String, nullable=False)
+    successful = Column(BOOLEAN, nullable=False)

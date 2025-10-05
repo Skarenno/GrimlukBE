@@ -3,7 +3,7 @@ from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
 from app.models.request_models import *
 from app.services.user_service import *
-from app.utils.authentication import hash_password, verify_password, generate_jwt, verify_JWT 
+from app.utils.authentication import verify_JWT 
 from jose import JWTError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -30,11 +30,12 @@ def open_db():
 
 
 @user_router.post("/login")
-async def login(user: UserLoginRequest, db: Session = Depends(open_db)):
+async def login(user_request: UserLoginRequest, request:Request, db: Session = Depends(open_db)):
     
-    try:
-        jwt_token = login_user_service(user, db)
-    except UserDoesNotExistError:
+    try: 
+        ip_address = request.client.host
+        jwt_token = login_user_service(user_request, ip_address, db)
+    except (UserDoesNotExistError, PasswordInvalidError):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
             content= {"detail" : "Invalid username or password"}
@@ -42,33 +43,33 @@ async def login(user: UserLoginRequest, db: Session = Depends(open_db)):
     
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content= {"jwt_token" : jwt_token, "message" : f"User {user.username} logged in successfully"}
+        content= {"jwt_token" : jwt_token, "message" : f"User {user_request.username} logged in successfully"}
     )
 
 @user_router.post("/register")
-async def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
+async def register(register_request: UserRegisterRequest, db: Session = Depends(open_db)):
 
     try:
-        jwt_token = register_user_service(request=request, db=db)
+        jwt_token = register_user_service(register_request, db)
     except UserAlreadyExistsError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": f"User {request.username} already registered"}
+            content={"detail": f"User {register_request.username} already registered"}
         )
     
     return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content= {"jwt_token" : jwt_token, "message" : f"User {request.username} regestered successfully"}
+            content= {"jwt_token" : jwt_token, "message" : f"User {register_request.username} regestered successfully"}
         )
 
 @user_router.post("/update_user_info")
-async def update_user_info(request: UserInfoRequest, db: Session = Depends(open_db)):
+async def update_user_info(update_user_request: UserInfoRequest, db: Session = Depends(open_db)):
     try:
-        update_user_info_service(request, db)
+        update_user_info_service(update_user_request, db)
     except UserDoesNotExistError:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-             content={"detail":f"User {request.username} not found"}
+             content={"detail":f"User {update_user_request.username} not found"}
         )
 
 

@@ -3,3 +3,6 @@ class UserAlreadyExistsError(Exception):
 
 class UserDoesNotExistError(Exception):
     pass
+
+class PasswordInvalidError(Exception):
+    pass

@@ -20,21 +20,23 @@ CREATE TABLE public."user" (
 	CONSTRAINT user_unique UNIQUE (username)
 );
 
-
-CREATE TABLE public.access_log (
-	user_id varchar NULL,
-	access_timestamp varchar NULL,
-	ip_address varchar NULL,
-	CONSTRAINT access_log_credentials_fk FOREIGN KEY (user_id) REFERENCES public.user(id)
-);
-
-
 CREATE TABLE public.user_credentials (
 	username varchar NOT NULL,
 	"password" varchar NOT NULL,
 	created_at varchar DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	CONSTRAINT credentials_unique PRIMARY KEY (username)
 );
+
+
+CREATE TABLE public.access_log (
+	id serial4 NOT NULL,
+	username varchar NULL,
+	access_timestamp timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	ip_address varchar NULL,
+	successful bool NULL,
+	CONSTRAINT access_log_unique UNIQUE (id)
+);
+
 
 
 
