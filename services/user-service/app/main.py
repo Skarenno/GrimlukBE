@@ -1,9 +1,9 @@
 import os
 from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
-from app.requests import *
-from app.dbClasses import UserCredentials
-from app.authentication import hash_password, verify_password, generate_jwt, verify_JWT 
+from app.models.request_models import *
+from app.services.user_service import *
+from app.utils.authentication import hash_password, verify_password, generate_jwt, verify_JWT 
 from jose import JWTError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -16,6 +16,10 @@ DB_URL = os.getenv("DATABASE_URL")
 db_engine = create_engine(DB_URL)
 session = sessionmaker(autoflush=False, autocommit=False, bind=db_engine)
 
+@app.options("/health")
+def health_check():
+    return {"status": "ok"}
+
 def open_db():
     db = session()       
     try:
@@ -24,55 +28,50 @@ def open_db():
         db.close()  
 
 
-@app.options("/health")
-def health_check():
-    return {"status": "ok"}
 
 @user_router.post("/login")
 async def login(user: UserLoginRequest, db: Session = Depends(open_db)):
-      
-    db_user = db.query(UserCredentials).filter(UserCredentials.username == user.username).first()
-
-    if(not db_user or not verify_password(user.password, db_user.password)):
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : "Invalid username or password"}
-            )
-        
-    jwt_token = generate_jwt(username=db_user.username)
+    
+    try:
+        jwt_token = login_user_service(user, db)
+    except UserDoesNotExistError:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content= {"detail" : "Invalid username or password"}
+        )
+    
     return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content= {"jwt_token" : jwt_token, "message" : f"User {user.username} logged in successfully"}
-            )
+        status_code=status.HTTP_200_OK,
+        content= {"jwt_token" : jwt_token, "message" : f"User {user.username} logged in successfully"}
+    )
 
 @user_router.post("/register")
 async def register(request: UserRegisterRequest, db: Session = Depends(open_db)):
-    db_user = db.query(UserCredentials).filter(UserCredentials.username == request.username).first()
 
-    if(db_user and db_user.username):
+    try:
+        jwt_token = register_user_service(request=request, db=db)
+    except UserAlreadyExistsError:
         return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : f"User {request.username} already registered"}
-            )
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail": f"User {request.username} already registered"}
+        )
     
-
-    register_user = UserCredentials(
-        username=request.username,
-        password=hash_password(request.password)
-    )
-
-    db.add(register_user)
-    db.commit()
-    db.refresh(register_user)
-
-    jwt_token = generate_jwt(register_user.username) 
     return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content= {"jwt_token" : jwt_token, "message" : f"User {register_user.username} regestered successfully"}
+            content= {"jwt_token" : jwt_token, "message" : f"User {request.username} regestered successfully"}
         )
 
-@user_router.post("/user_info")
-async def write_user_info(request: UserInfoRequest, db: Session = Depends(open_db)):
+@user_router.post("/update_user_info")
+async def update_user_info(request: UserInfoRequest, db: Session = Depends(open_db)):
+    try:
+        update_user_info_service(request, db)
+    except UserDoesNotExistError:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+             content={"detail":f"User {request.username} not found"}
+        )
+
+
     return 1
 
 

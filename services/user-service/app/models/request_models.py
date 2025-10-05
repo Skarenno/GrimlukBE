@@ -2,6 +2,7 @@ from pydantic import BaseModel, field_validator, model_validator
 from fastapi import HTTPException, status
 import re
 import logging
+from app.utils.enum_utils import GENDER
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -13,14 +14,8 @@ class UserLoginRequest(BaseModel):
     @model_validator(mode='before')
     def validateUserRegisterRequest(cls, user: dict):
         validateBody(cls, user)
-
-        if(not user["username"] or user["username"].strip() == ""):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username cannot be empty"
-            )
-
         return user
+
 
 class UserRegisterRequest(BaseModel):   
     username: str
@@ -30,13 +25,6 @@ class UserRegisterRequest(BaseModel):
     @model_validator(mode='before')
     def validateUserRegisterRequest(cls, user: dict):
         validateBody(cls, user)
-
-        if(not user["username"] or user["username"].strip() == "" or not user["email"] or user["email"].strip() == ""):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username cannot be empty"
-            )
-
         return user
     
     @field_validator("email")
@@ -69,20 +57,50 @@ class UserRegisterRequest(BaseModel):
         return password
 
 
+
+
 class UserInfoRequest(BaseModel) : 
+    
+    username: str
+    tax_code: str
     name : str
     surname: str
+    phone: str | None = None
+    gender: GENDER
+    residence_address_1 : str
+    residence_address_2 : str | None = None
+    city : str
+    province : str 
+    postal_code: str
+    country: str
+
+    @model_validator(mode='before')
+    def validateUserInfoRequest(cls, user: dict):
+        validateBody(cls, user)
+        return user
+    
 
 
 def validateBody(cls, body:dict):
     allowed_keys = cls.model_fields.keys()
+    body_keys =  body.keys()
 
     logger.info(allowed_keys)
     logger.info(body)
-    for attribute in body.keys():
+
+    #Check for valid keys
+    for attribute in body_keys:
         logger.info(f"attribute: {attribute}")
         if not attribute in allowed_keys:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username cannot be empty"
+                detail=f"{attribute} is not a valid key"
             )
+        
+    #Check for mandatory keys
+    #for key in mandatory_keys:
+    #    if key not in body_keys:
+    #        raise HTTPException(
+    #            status_code=status.HTTP_400_BAD_REQUEST,
+    #            detail=f"missing property {key}"
+    #        )

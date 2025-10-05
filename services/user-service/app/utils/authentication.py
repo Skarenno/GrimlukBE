@@ -9,7 +9,7 @@ ISSUER = os.getenv("JWT_ISSUER")
 
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 180
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
