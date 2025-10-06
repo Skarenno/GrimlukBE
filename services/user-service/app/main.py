@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI, APIRouter, Request, Depends
+from fastapi import FastAPI, APIRouter, Request,Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.models.request_models import *
 from app.services.user_service import *
@@ -115,6 +116,17 @@ async def middleware(request: Request, call_next):
         
         
 
+origins = [
+    "http://localhost:5173",  # Your frontend URL
+    "http://127.0.0.1:5173",  # Sometimes Vite uses 127.0.0.1
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,          # Allows requests from these origins
+    allow_credentials=True,         # Needed if you send cookies or auth
+    allow_methods=["*"],            # Allows POST, GET, OPTIONS, etc.
+    allow_headers=["*"],            # Allows custom headers like Authorization
+)
 
 app.include_router(user_router) 
