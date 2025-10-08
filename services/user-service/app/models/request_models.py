@@ -18,7 +18,6 @@ class UserLoginRequest(BaseModel):
 
 
 class UserRegisterRequest(BaseModel):   
-    username: str
     email: str
     password: str
 
@@ -39,6 +38,8 @@ class UserRegisterRequest(BaseModel):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email is not valid"
             )
+        
+        return email
 
     
     @field_validator("password")

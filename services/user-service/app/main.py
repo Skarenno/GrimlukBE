@@ -14,29 +14,22 @@ from sqlalchemy.orm import Session, sessionmaker
 app = FastAPI()
 user_router = APIRouter(prefix="/user")
 
-DB_URL = os.getenv("DATABASE_URL")
-db_engine = create_engine(DB_URL)
-session = sessionmaker(autoflush=False, autocommit=False, bind=db_engine)
+
 
 @app.options("/health")
 def health_check():
     return {"status": "ok"}
 
-def open_db():
-    db = session()       
-    try:
-        yield db              
-    finally:
-        db.close()  
+
 
 
 
 @user_router.post("/login")
-async def login(user_request: UserLoginRequest, request:Request, db: Session = Depends(open_db)):
+async def login(user_request: UserLoginRequest, request:Request):
     
     try: 
         ip_address = request.client.host
-        jwt_token = login_user_service(user_request, ip_address, db)
+        jwt_token = login_user_service(user_request, ip_address)
     except (UserDoesNotExistError, PasswordInvalidError):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -49,26 +42,26 @@ async def login(user_request: UserLoginRequest, request:Request, db: Session = D
     )
 
 @user_router.post("/register")
-async def register(register_request: UserRegisterRequest, db: Session = Depends(open_db)):
+async def register(register_request: UserRegisterRequest):
 
     try:
-        jwt_token = register_user_service(register_request, db)
+        jwt_token = register_user_service(register_request)
     except UserAlreadyExistsError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": f"User {register_request.username} already registered"}
+            content={"detail": f"User {register_request.email} already registered"}
         )
     
     return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content= {"jwt_token" : jwt_token, "message" : f"User {register_request.username} regestered successfully"}
+            content= {"jwt_token" : jwt_token, "message" : f"User {register_request.email} regestered successfully"}
         )
 
 @user_router.post("/update_user_info")
-async def update_user_info(update_user_request: UserInfoRequest, request:Request, db: Session = Depends(open_db)):
+async def update_user_info(update_user_request: UserInfoRequest, request:Request):
     try:
         check_jwt_user_auth(request.state.user, update_user_request.username)
-        update_user_info_service(update_user_request, db)
+        upsert_user_info_service(update_user_request)
     except UserDoesNotExistError:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
