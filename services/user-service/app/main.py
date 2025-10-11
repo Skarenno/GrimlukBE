@@ -1,8 +1,10 @@
 import os
-from fastapi import FastAPI, APIRouter, Request,Depends
+from fastapi import FastAPI, APIRouter, Request 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from app.models.request_models import *
+from app.models.response_models import *
 from app.services.user_service import *
 from app.utils.authentication import verify_JWT, check_jwt_user_auth 
 from app.exceptions.authentication_exception import *
@@ -57,7 +59,7 @@ async def register(register_request: UserRegisterRequest):
             content= {"jwt_token" : jwt_token, "message" : f"User {register_request.email} regestered successfully"}
         )
 
-@user_router.post("/update_user_info")
+@user_router.post("/updateUserInfo")
 async def update_user_info(update_user_request: UserInfoRequest, request:Request):
     try:
         check_jwt_user_auth(request.state.user, update_user_request.username)
@@ -70,7 +72,7 @@ async def update_user_info(update_user_request: UserInfoRequest, request:Request
     except JwtPermissionError:
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content={"detail" : "Authorization error: cannot update other users"}
+            content={"detail" : "Authorization error: cannot query other users"}
         )
 
     return JSONResponse(
@@ -78,6 +80,26 @@ async def update_user_info(update_user_request: UserInfoRequest, request:Request
         content={"detail" : f"{update_user_request.username} updated correctly"}
     )
 
+@user_router.get("/getUserInfo/{username}", response_model=UserInfoResponse)
+async def get_user_info(username:str, request:Request):
+    try:
+        check_jwt_user_auth(request.state.user, username)
+        user = get_user_info_service(username)
+    except UserDoesNotExistError:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+             content={"detail":f"User {username} not found"}
+        )
+    except JwtPermissionError:
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"detail" : "Authorization error: cannot query other users"}
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder(user)
+    )
 
 @app.middleware('http')
 async def middleware(request: Request, call_next):

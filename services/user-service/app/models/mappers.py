@@ -1,5 +1,6 @@
 from app.models.db_models import UserModel
 from app.models.request_models import UserInfoRequest
+from app.models.response_models import UserInfoResponse
 import uuid
 
 residence_fields = [
@@ -24,3 +25,6 @@ def map_user_info_to_db(request: UserInfoRequest, existing_user: UserModel | Non
         return existing_user
 
     return UserModel(id=str(uuid.uuid4()), **user_data)
+
+def map_user_db_to_response(db_model: UserModel) -> UserInfoResponse:
+    return UserInfoResponse.model_validate(db_model)
