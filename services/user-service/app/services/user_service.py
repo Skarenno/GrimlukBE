@@ -9,13 +9,13 @@ from app.utils.authentication import hash_password, verify_password, generate_jw
 from app.exceptions.service_exceptions import *
 from datetime import datetime
 
-def register_user_service(request:UserRegisterRequest):
-    existing = get_user_credentials_by_username(request.email)
+def register_user_service(request:UserLoginRequest):
+    existing = get_user_credentials_by_username(request.username)
     if existing:
         raise UserAlreadyExistsError
 
     new_user = UserCredentialsModel(
-        username=request.email,
+        username=request.username,
         password=hash_password(request.password)
     )
 

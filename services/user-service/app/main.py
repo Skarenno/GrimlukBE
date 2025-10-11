@@ -47,16 +47,17 @@ async def login(user_request: UserLoginRequest, request:Request):
 async def register(register_request: UserRegisterRequest):
 
     try:
-        jwt_token = register_user_service(register_request)
+        jwt_token = register_user_service(register_request.userCredentials)
+        upsert_user_info_service(register_request.userInfo )
     except UserAlreadyExistsError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": f"User {register_request.email} already registered"}
+            content={"detail": f"User {register_request.userCredentials.username} already registered"}
         )
     
     return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content= {"jwt_token" : jwt_token, "message" : f"User {register_request.email} regestered successfully"}
+            content= {"jwt_token" : jwt_token, "message" : f"User {register_request.userCredentials.username} regestered successfully"}
         )
 
 @user_router.post("/updateUserInfo")

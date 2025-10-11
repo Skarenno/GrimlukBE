@@ -12,7 +12,7 @@ SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=db_engine)
 
 def open_db():
     db = SessionLocal()       
-    try:
+    try:    
         yield db              
     finally:
         db.close()  

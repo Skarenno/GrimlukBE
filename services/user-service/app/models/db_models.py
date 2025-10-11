@@ -17,6 +17,7 @@ class UserModel(Base):
     tax_code = Column(String(16), nullable=False)
     name = Column(String, nullable=False)
     surname = Column(String, unique=True,nullable=False)
+    birth_date = Column(DateTime, nullable=False)
     mail = Column(String, nullable=False)
     username = Column(String, ForeignKey("user_credentials.username"), nullable=False)
     phone = Column(String, nullable=True)

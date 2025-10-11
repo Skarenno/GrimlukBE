@@ -3,19 +3,20 @@
 
 CREATE TABLE public."user" (
 	id varchar NOT NULL,
-	tax_code varchar(16) NULL,
+	username varchar NULL,
+	tax_code varchar(16) NOT NULL,
 	name varchar NULL,
 	surname varchar NULL,
+	birth_date DATE NOT NULL,
 	mail varchar NULL,
-	username varchar NULL,
 	phone varchar NULL,
 	gender bpchar(1) NULL,	
-	residence_address_1 varchar NOT NULL,
+	residence_address_1 varchar NULL,
 	residence_address_2 varchar NULL,
-	postal_code varchar NOT NULL,
-	city varchar NOT NULL,
-	country varchar NOT NULL,
-	province varchar NOT NULL,
+	postal_code varchar NULL,
+	city varchar NULL,
+	country varchar NULL,
+	province varchar NULL,
 	CONSTRAINT user_pk PRIMARY KEY (id),
 	CONSTRAINT user_unique UNIQUE (username)
 );
@@ -42,8 +43,8 @@ CREATE TABLE public.access_log (
 
 
 -- TEST DATA INSERTION
-INSERT INTO public."user" (id,tax_code,"name",surname,mail,username,phone,gender, residence_address_1, residence_address_2, postal_code, city, country, province) VALUES
-	 ('1','TSTBVN99S04F839N','Bonaventura Salvatore','Testa','zqaz1234@gmail.com','zqaz1234@gmail.com','3755222244','M', 'VIA CAPPELLA III TRAV', NULL, '80070', 'MONTE DI PROCIDA', 'ITALY', 'NA');
+INSERT INTO public."user" (id,username,tax_code,"name",surname,birth_date, mail,phone,gender, residence_address_1, residence_address_2, postal_code, city, country, province) VALUES
+	 ('1','zqaz1234@gmail.com','TSTBVN99S04F839N','Bonaventura Salvatore','Testa','1999-11-04 00:00:00','zqaz1234@gmail.com','3755222244','M', 'VIA CAPPELLA III TRAV', NULL, '80070', 'MONTE DI PROCIDA', 'ITALY', 'NA');
 
 INSERT INTO public.user_credentials
 (username, "password", created_at)
