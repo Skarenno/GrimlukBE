@@ -81,19 +81,19 @@ async def update_user_info(update_user_request: UserInfoRequest, request:Request
         content={"detail" : f"{update_user_request.username} updated correctly"}
     )
 
-@user_router.get("/getUserInfo/{username}", response_model=UserInfoResponse)
-async def get_user_info(username:str, request:Request):
+@user_router.get("/getUserInfo/{user_id}", response_model=UserInfoResponse)
+async def get_user_info(user_id:str, request:Request):
     try:
-        check_jwt_user_auth(request.state.user, username)
-        user = get_user_info_service(username)
+        user = get_user_info_service(user_id)
+        check_jwt_user_auth(request.state.user, user.username)
     except UserDoesNotExistError:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-             content={"detail":f"User {username} not found"}
+             content={"detail":f"User {user_id} not found"}
         )
     except JwtPermissionError:
         return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             content={"detail" : "Authorization error: cannot query other users"}
         )
 
@@ -133,16 +133,17 @@ async def middleware(request: Request, call_next):
         
 
 origins = [
-    "http://localhost:5173",  # Your frontend URL
-    "http://127.0.0.1:5173",  # Sometimes Vite uses 127.0.0.1
+    "http://localhost:5173",  
+    "http://127.0.0.1:5173",  
+    "http://account-service:8002"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,          # Allows requests from these origins
-    allow_credentials=True,         # Needed if you send cookies or auth
-    allow_methods=["*"],            # Allows POST, GET, OPTIONS, etc.
-    allow_headers=["*"],            # Allows custom headers like Authorization
+    allow_origins=origins,          
+    allow_credentials=True,         
+    allow_methods=["*"],            
+    allow_headers=["*"],            
 )
 
 app.include_router(user_router) 

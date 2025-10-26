@@ -1,0 +1,2 @@
+class JwtPermissionError(Exception):
+    pass

@@ -5,7 +5,7 @@ services:
     build: ./services/user-service
     container_name: user-service
     ports:
-      - "8001:8000"
+      - "8001:8001"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/userdb
       - JWT_KEY=ilbuiooltrelasiepe
@@ -17,9 +17,13 @@ services:
     build: ./services/account-service
     container_name: account-service
     ports:
-      - "8002:8000"
+      - "8002:8002"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/accountdb
+      - JWT_KEY=ilbuiooltrelasiepe
+      - JWT_ISSUER=grimluk-finance.com
+      - ACCOUNT_LIMIT=2
+      - USER_SERVICE_URL=http://user-service:8001
     depends_on:
       - db
 

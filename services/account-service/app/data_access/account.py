@@ -1,7 +1,7 @@
 import os
 from fastapi import Depends
 from app.models.request_models import *
-from app.services.user_service import *
+from app.models.db_models import Account
 from app.exceptions.authentication_exception import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -17,21 +17,27 @@ def open_db():
     finally:
         db.close()  
 
-def get_user_info_by_username(username:str):
-    with SessionLocal() as db:
-        return db.query(UserModel).filter(UserModel.username == username).first()
-    
 
-def get_user_info_by_user_id(user_id:str):
+def upsert_account(account:Account):
     with SessionLocal() as db:
-        return db.query(UserModel).filter(UserModel.id == user_id).first()
-
-
-def upsert_user_info(user:UserModel):
-    with SessionLocal() as db:
-        if user not in db:
-            db.add(user)
+        if account not in db:
+            db.add(account)
 
         db.commit()
-        db.refresh(user)
-        return user
+        db.refresh(account)
+        return account
+    
+def insert_account(account:Account):
+    with SessionLocal() as db:
+        if account in db:
+            raise KeyError
+        
+        db.add(account)
+        db.commit()
+        db.refresh(account)
+
+    return account
+
+def get_accounts_by_userid(user_id:int):
+    with SessionLocal() as db:
+        return db.query(Account).filter(Account.user_id == user_id).all()
