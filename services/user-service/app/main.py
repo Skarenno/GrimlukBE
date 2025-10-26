@@ -31,7 +31,7 @@ async def login(user_request: UserLoginRequest, request:Request):
     
     try: 
         ip_address = request.client.host
-        jwt_token = login_user_service(user_request, ip_address)
+        (jwt_token, user) = login_user_service(user_request, ip_address)
     except (UserDoesNotExistError, PasswordInvalidError):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,7 +40,9 @@ async def login(user_request: UserLoginRequest, request:Request):
     
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content= {"jwt_token" : jwt_token, "message" : f"User {user_request.username} logged in successfully"}
+        content= {"jwt_token" : jwt_token, 
+                  "user" : jsonable_encoder(user),
+                  "message" : f"User {user_request.username} logged in successfully"}
     )
 
 @user_router.post("/register")
@@ -48,7 +50,7 @@ async def register(register_request: UserRegisterRequest):
 
     try:
         jwt_token = register_user_service(register_request.userCredentials)
-        upsert_user_info_service(register_request.userInfo )
+        user = upsert_user_info_service(register_request.userInfo )
     except UserAlreadyExistsError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -57,7 +59,9 @@ async def register(register_request: UserRegisterRequest):
     
     return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content= {"jwt_token" : jwt_token, "message" : f"User {register_request.userCredentials.username} regestered successfully"}
+            content= {"jwt_token" : jwt_token, 
+                      "user" : jsonable_encoder(user),
+                      "message" : f"User {register_request.userCredentials.username} regestered successfully"}
         )
 
 @user_router.post("/updateUserInfo")

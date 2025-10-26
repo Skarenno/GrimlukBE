@@ -24,16 +24,17 @@ def register_user_service(request:UserLoginRequest):
 
 
 def login_user_service(request:UserLoginRequest, ip_address:str):
-    db_user = get_user_credentials_by_username(request.username)
-
-    if(not db_user):
+    db_user_credentials = get_user_credentials_by_username(request.username)
+    
+    if(not db_user_credentials):
             raise UserDoesNotExistError
-    if(not verify_password(request.password, db_user.password)):
+    if(not verify_password(request.password, db_user_credentials.password)):
             insert_access_log(request, ip_address, successful=False)
             raise PasswordInvalidError
 
+    db_user_info = get_user_info_by_username(request.username)
     insert_access_log(request,ip_address)
-    return generate_jwt(db_user.username)
+    return (generate_jwt(db_user_credentials.username), map_user_db_to_response(db_user_info))
 
 def get_user_info_service(user_id:str):
     db_user = get_user_info_by_user_id(user_id)
@@ -47,7 +48,7 @@ def upsert_user_info_service(request:UserInfoRequest):
     db_user = get_user_info_by_username(request.username)
     db_user = map_user_info_to_db(request, existing_user=db_user)
 
-    return upsert_user_info(db_user)
+    return map_user_db_to_response(upsert_user_info(db_user))
 
     
 def insert_access_log(request:UserLoginRequest, ip_address:str, successful=True):

@@ -1,20 +1,23 @@
 from pydantic import BaseModel
-from app.utils.enum_utils import GENDER
+from typing import Literal
+
+# Assuming GENDER is an enum like this:
+GENDER = Literal["M", "F", "O"]
 
 class UserInfoResponse(BaseModel):
-
+    id: str
     username: str
     tax_code: str
-    name : str
+    name: str
     surname: str
     phone: str | None = None
-    gender: GENDER
-    residence_address_1 : str
-    residence_address_2 : str | None = None
-    city : str
-    province : str 
-    postal_code: str
-    country: str
+    gender: GENDER | None = None            
+    residence_address_1: str | None = None  
+    residence_address_2: str | None = None
+    city: str | None = None
+    province: str | None = None
+    postal_code: str | None = None
+    country: str | None = None
 
     class Config:
         from_attributes = True 
