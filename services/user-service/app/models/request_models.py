@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, field_validator, model_validator, model_serializer
 from fastapi import HTTPException, status
 import re
 import logging
@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class UserInfoRequest(BaseModel) : 
-    
+    id:str
     username: str
     tax_code: str
     name : str
@@ -20,18 +20,17 @@ class UserInfoRequest(BaseModel) :
     gender: GENDER | None = None
     residence_address_1 : str | None = None
     residence_address_2 : str | None = None
-    mail:str
     city : str | None = None
     province : str | None = None
     postal_code: str | None = None
     country: str | None = None
-
+    
     @model_validator(mode='before')
     def validateUserInfoRequest(cls, user: dict):
         validateBody(cls, user)
         return user
     
-    @field_validator("mail")
+    @field_validator("username")
     @classmethod
     def validate_email(cls, mail: str) -> str:
         email_pattern = re.compile(
@@ -145,9 +144,9 @@ def validateBody(cls, body:dict):
         if not attribute in allowed_keys:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"{attribute} is not a valid key"
+                detail=f"{attribute} is not a valid key for {cls.__name__}"
             )
-        
+
     #Check for mandatory keys
     #for key in mandatory_keys:
     #    if key not in body_keys:

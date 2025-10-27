@@ -3,7 +3,7 @@ from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from app.models.request_models import *
+from app.models.request_models import UserInfoRequest, UserLoginRequest, UserRegisterRequest
 from app.models.response_models import *
 from app.services.user_service import *
 from app.utils.authentication import verify_JWT, check_jwt_user_auth 
@@ -108,7 +108,7 @@ async def get_user_info(user_id:str, request:Request):
 
 @app.middleware('http')
 async def middleware(request: Request, call_next):
-    free_paths = ["/user/login", "/user/register"]
+    free_paths = ["/user/login", "/user/register", "/health"]
 
     
     if(not request.url.path in free_paths):
