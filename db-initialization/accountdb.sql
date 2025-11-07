@@ -41,6 +41,10 @@ CREATE TABLE cards (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE account_types (
+    code VARCHAR(5) PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
 
 
 
@@ -77,3 +81,6 @@ INSERT INTO accounts (
     'BR001',                       
     'CHK001'                       
 );
+
+INSERT INTO account_types (code, "name")
+VALUES ('SA001', 'SAVING');

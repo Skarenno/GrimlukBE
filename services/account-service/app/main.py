@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi import status
 from app.models.request_models import *
 from app.models.response_models import *
-from app.services.account_service import create_account_service, get_accounts_service
+from app.services.account_service import create_account_service, get_accounts_service, get_account_types
 from app.utils.authentication import verify_JWT, check_jwt_user_auth
 from app.exceptions.authentication_exception import *
 from app.exceptions.service_exception import *
@@ -70,6 +70,18 @@ def get_user_accounts(user_id: int, request:Request):
     
     return accounts
 
+@account_router.get("/getAccountTypes", response_model=list[AccountTypeResponse])
+def get_types(request:Request):
+    try:
+        account_types = get_account_types()
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"error" : "Generic server error"}
+        ) 
+
+    return account_types
 
 @app.middleware('http')
 async def middleware(request: Request, call_next):

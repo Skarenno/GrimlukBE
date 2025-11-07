@@ -45,3 +45,8 @@ class Transaction(Base):
     account = relationship("Account", back_populates="transactions")
 
     
+class AccountType(Base):
+    __tablename__ = "account_types"
+
+    code = Column(String(5), primary_key=True)
+    name = Column(String(50))
