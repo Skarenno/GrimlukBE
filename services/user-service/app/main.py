@@ -134,13 +134,15 @@ async def middleware(request: Request, call_next):
             content= {"detail" : "Unexpected error - " + str(e)}
         )
         
-        
-
 origins = [
-    "http://localhost:5173",  
-    "http://127.0.0.1:5173",  
-    "http://account-service:8002"
-]
+"http://localhost:5173",  
+"http://127.0.0.1:5173", 
+"http://localhost:4173",  
+"http://127.0.0.1:4173",  
+"http://account-service:8002"
+
+]       
+
 
 app.add_middleware(
     CORSMiddleware,

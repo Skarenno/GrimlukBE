@@ -49,3 +49,5 @@ INSERT INTO public."user" (id,username,tax_code,"name",surname,birth_date, mail,
 INSERT INTO public.user_credentials
 (username, "password", created_at)
 VALUES('zqaz1234@gmail.com', '$2b$12$AcN/2E5NptjPH1GobVLGFueFMxnakpcBQsINsLWoeUFWm1he.qGmC', '2025-10-05 14:41:45.145642+00');
+
+

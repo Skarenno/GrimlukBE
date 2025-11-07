@@ -23,18 +23,57 @@ CREATE TABLE accounts (
     CONSTRAINT accounts_userid_idx UNIQUE (user_id, account_number)
 );
 
+
 CREATE INDEX idx_accounts_user_id ON accounts (user_id);
 CREATE INDEX idx_accounts_username ON accounts (username);
 
--- 2. Transactions table
-CREATE TABLE transactions (
+
+-- Card table
+CREATE TABLE cards (
     id SERIAL PRIMARY KEY,
-    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-    type VARCHAR(20) NOT NULL,
-    amount NUMERIC(15, 2) NOT NULL,
-    timestamp TIMESTAMPTZ DEFAULT NOW(),
-    description VARCHAR,
-    target_account VARCHAR(20)
+    account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    card_number VARCHAR(20) UNIQUE NOT NULL,
+    card_type VARCHAR(50) NOT NULL,
+    expiration_date DATE NOT NULL,
+    cvv VARCHAR(4) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_transactions_account_id ON transactions (account_id);
+
+
+
+-- TESTING DATA -----------------------------------
+
+INSERT INTO accounts (
+    username,
+    user_id,
+    account_number,
+    account_type,
+    currency,
+    balance,
+    available_balance,
+    credit_limit,
+    interest_rate,
+    last_activity,
+    status,
+    is_joint,
+    branch_code,
+    product_code
+) VALUES (
+    'zqaz1234@gmail.com',          
+    1,                             
+    'IT60X0542811101000000123456', 
+    'checking',                    
+    'EUR',                         
+    1500.75,                       
+    1450.75,                       
+    500.00,                        
+    1.25,                          
+    NOW(),                         
+    'active',                      
+    FALSE,                         
+    'BR001',                       
+    'CHK001'                       
+);

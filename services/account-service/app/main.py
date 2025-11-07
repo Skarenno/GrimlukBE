@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from fastapi import status
 from app.models.request_models import *
 from app.models.response_models import *
-from app.services.account_service import create_account_service
-from app.utils.authentication import verify_JWT
+from app.services.account_service import create_account_service, get_accounts_service
+from app.utils.authentication import verify_JWT, check_jwt_user_auth
 from app.exceptions.authentication_exception import *
 from app.exceptions.service_exception import *
 from jose import JWTError
@@ -24,7 +24,9 @@ def create_account(account_create_request:AccountCreateRequest, request:Request)
     try:
         bearer_token = request.headers.get("Authorization")
         user = request.state.user
-        account = create_account_service(account_create_request, user, bearer_token)
+
+        check_jwt_user_auth(user, request.username)
+        account = create_account_service(account_create_request, bearer_token)
     except JwtPermissionError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,10 +56,24 @@ def create_account(account_create_request:AccountCreateRequest, request:Request)
     
     return account
 
+@account_router.get("/getAccounts/{user_id}", response_model=list[AccountResponse])
+def get_user_accounts(user_id: int, request:Request):
+    try:
+        bearer_token = request.headers.get("Authorization")
+        accounts = get_accounts_service(user_id, bearer_token)
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"error" : "Generic server error"}
+        ) 
+    
+    return accounts
+
 
 @app.middleware('http')
 async def middleware(request: Request, call_next):
-    free_paths = []
+    free_paths = ["/health"]
     
     if(not request.url.path in free_paths):
         try:
@@ -83,8 +99,10 @@ async def middleware(request: Request, call_next):
         )
     
 origins = [
-    "http://localhost:5173",  # Your frontend URL
-    "http://127.0.0.1:5173",  # Sometimes Vite uses 127.0.0.1
+    "http://localhost:5173",  
+    "http://127.0.0.1:5173", 
+    "http://localhost:4173",  
+    "http://127.0.0.1:4173",  
 ]
 
 app.add_middleware(
