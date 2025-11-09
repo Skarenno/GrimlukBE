@@ -24,7 +24,7 @@ def map_user_info_to_db(request: UserInfoRequest, existing_user: UserModel | Non
             setattr(existing_user, k, v)
         return existing_user
 
-    return UserModel(id=str(uuid.uuid4()), **user_data)
+    return UserModel(**user_data)
 
 def map_user_db_to_response(db_model: UserModel) -> UserInfoResponse:
     return UserInfoResponse.model_validate(db_model)

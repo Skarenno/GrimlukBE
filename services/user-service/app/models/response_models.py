@@ -6,7 +6,7 @@ from typing import Literal
 GENDER = Literal["M", "F", "O"]
 
 class UserInfoResponse(BaseModel):
-    id: str
+    id: int
     username: str
     tax_code: str
     name: str

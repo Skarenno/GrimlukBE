@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class UserInfoRequest(BaseModel) : 
-    id:str
+    id:int | None = None
     username: str
     tax_code: str
     name : str

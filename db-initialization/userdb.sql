@@ -1,8 +1,9 @@
 \c userdb
 
 
+
 CREATE TABLE public."user" (
-	id varchar NOT NULL,
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	username varchar NULL,
 	tax_code varchar(16) NOT NULL,
 	name varchar NULL,
@@ -17,7 +18,6 @@ CREATE TABLE public."user" (
 	city varchar NULL,
 	country varchar NULL,
 	province varchar NULL,
-	CONSTRAINT user_pk PRIMARY KEY (id),
 	CONSTRAINT user_unique UNIQUE (username)
 );
 
