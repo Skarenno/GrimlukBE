@@ -9,4 +9,4 @@ from app.models.parent_models import AccountBase
 class AccountCreateRequest(AccountBase):
     user_id: int
     username: str
-    initial_deposit: Optional[Decimal] = Field(default=0.00, example=100.00)
+    initial_deposit: Optional[Decimal] = Field(default=10.00, example=100.00)

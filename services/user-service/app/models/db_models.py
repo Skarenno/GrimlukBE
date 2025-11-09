@@ -13,7 +13,7 @@ class UserCredentialsModel(Base):
 class UserModel(Base):
     __tablename__ = "user"
 
-    id = Column(String, primary_key = True, unique=True, index=True, nullable=False)
+    id = Column(Integer, primary_key = True, unique=True, autoincrement=True, index=True, nullable=False)
     tax_code = Column(String(16), nullable=False)
     name = Column(String, nullable=False)
     surname = Column(String, unique=True,nullable=False)

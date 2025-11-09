@@ -36,7 +36,7 @@ def login_user_service(request:UserLoginRequest, ip_address:str):
     insert_access_log(request,ip_address)
     return (generate_jwt(db_user_credentials.username), map_user_db_to_response(db_user_info))
 
-def get_user_info_service(user_id:str):
+def get_user_info_service(user_id:int):
     db_user = get_user_info_by_user_id(user_id)
     if not db_user or not db_user.id:
          raise UserDoesNotExistError

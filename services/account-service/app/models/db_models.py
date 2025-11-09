@@ -9,7 +9,7 @@ Base = declarative_base()
 class Account(Base):
     __tablename__ = "accounts"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     username = Column(String, nullable = False)
     user_id = Column(Integer, index=True, nullable=False)
     account_number = Column(String(34), unique=True, nullable=False)
