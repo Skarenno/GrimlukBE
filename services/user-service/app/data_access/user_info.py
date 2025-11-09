@@ -22,7 +22,7 @@ def get_user_info_by_username(username:str):
         return db.query(UserModel).filter(UserModel.username == username).first()
     
 
-def get_user_info_by_user_id(user_id:str):
+def get_user_info_by_user_id(user_id:int):
     with SessionLocal() as db:
         return db.query(UserModel).filter(UserModel.id == user_id).first()
 

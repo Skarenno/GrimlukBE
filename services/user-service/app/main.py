@@ -86,7 +86,7 @@ async def update_user_info(update_user_request: UserInfoRequest, request:Request
     )
 
 @user_router.get("/getUserInfo/{user_id}", response_model=UserInfoResponse)
-async def get_user_info(user_id:str, request:Request):
+async def get_user_info(user_id:int, request:Request):
     try:
         user = get_user_info_service(user_id)
         check_jwt_user_auth(request.state.user, user.username)
