@@ -46,6 +46,9 @@ def get_user_info_service(user_id:int):
     return map_user_db_to_response(db_user)
      
 
+def refresh_jwt_token(jwt_payload:dict):
+    return generate_jwt(jwt_payload.get("sub"))
+
 def upsert_user_info_service(request:UserInfoRequest):
     db_user = get_user_info_by_username(request.username)
     db_user = map_user_info_to_db(request, existing_user=db_user)

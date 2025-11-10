@@ -3,7 +3,7 @@ from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from app.models.request_models import UserInfoRequest, UserLoginRequest, UserRegisterRequest
+from app.models.request_models import UserInfoRequest, UserLoginRequest, UserRegisterRequest, TokenRefreshRequest
 from app.models.response_models import *
 from app.services.user_service import *
 from app.utils.authentication import verify_JWT, check_jwt_user_auth 
@@ -66,6 +66,23 @@ async def register(register_request: UserRegisterRequest):
                       "message" : f"User {register_request.userCredentials.username} regestered successfully"}
         )
 
+@user_router.get("/refreshToken")
+async def refresh(request:Request):
+    try:
+        jwt_payload = request.state.user
+        (jwt_token, refresh_token) = refresh_jwt_token(jwt_payload)
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"error": f"Could not refresh token"}
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"jwt_token" : jwt_token, "refresh_token" : refresh_token}
+    )
+    
 @user_router.post("/updateUserInfo")
 async def update_user_info(update_user_request: UserInfoRequest, request:Request):
     try:
@@ -110,7 +127,7 @@ async def get_user_info(user_id:int, request:Request):
 
 @app.middleware('http')
 async def middleware(request: Request, call_next):
-    free_paths = ["/user/login", "/user/register", "/health"]
+    free_paths = ["/user/login", "/user/register", "/health", "/refreshToken"]
 
     
     if(not request.url.path in free_paths):
