@@ -102,6 +102,10 @@ class UserLoginRequest(BaseModel):
         return username
 
 
+class TokenRefreshRequest(BaseModel):
+    refresh_token:str
+
+
 class UserRegisterRequest(BaseModel):   
     userCredentials:UserLoginRequest
     userInfo:UserInfoRequest

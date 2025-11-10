@@ -3,7 +3,7 @@ from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from app.models.request_models import UserInfoRequest, UserLoginRequest, UserRegisterRequest
+from app.models.request_models import UserInfoRequest, UserLoginRequest, UserRegisterRequest, TokenRefreshRequest
 from app.models.response_models import *
 from app.services.user_service import *
 from app.utils.authentication import verify_JWT, check_jwt_user_auth 
@@ -31,7 +31,7 @@ async def login(user_request: UserLoginRequest, request:Request):
     
     try: 
         ip_address = request.client.host
-        (jwt_token, user) = login_user_service(user_request, ip_address)
+        (jwt_token, refresh_token, user) = login_user_service(user_request, ip_address)
     except (UserDoesNotExistError, PasswordInvalidError):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -41,6 +41,7 @@ async def login(user_request: UserLoginRequest, request:Request):
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content= {"jwt_token" : jwt_token, 
+                  "refresh_token" : refresh_token,
                   "user" : jsonable_encoder(user),
                   "message" : f"User {user_request.username} logged in successfully"}
     )
@@ -49,7 +50,7 @@ async def login(user_request: UserLoginRequest, request:Request):
 async def register(register_request: UserRegisterRequest):
 
     try:
-        jwt_token = register_user_service(register_request.userCredentials)
+        (jwt_token, refresh_token) = register_user_service(register_request.userCredentials)
         user = upsert_user_info_service(register_request.userInfo )
     except UserAlreadyExistsError:
         return JSONResponse(
@@ -60,10 +61,28 @@ async def register(register_request: UserRegisterRequest):
     return JSONResponse(
             status_code=status.HTTP_200_OK,
             content= {"jwt_token" : jwt_token, 
+                      "refresh_token" : refresh_token,
                       "user" : jsonable_encoder(user),
                       "message" : f"User {register_request.userCredentials.username} regestered successfully"}
         )
 
+@user_router.get("/refreshToken")
+async def refresh(request:Request):
+    try:
+        jwt_payload = request.state.user
+        (jwt_token, refresh_token) = refresh_jwt_token(jwt_payload)
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"error": f"Could not refresh token"}
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"jwt_token" : jwt_token, "refresh_token" : refresh_token}
+    )
+    
 @user_router.post("/updateUserInfo")
 async def update_user_info(update_user_request: UserInfoRequest, request:Request):
     try:
@@ -108,7 +127,7 @@ async def get_user_info(user_id:int, request:Request):
 
 @app.middleware('http')
 async def middleware(request: Request, call_next):
-    free_paths = ["/user/login", "/user/register", "/health"]
+    free_paths = ["/user/login", "/user/register", "/health", "/refreshToken"]
 
     
     if(not request.url.path in free_paths):

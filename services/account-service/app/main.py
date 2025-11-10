@@ -25,7 +25,7 @@ def create_account(account_create_request:AccountCreateRequest, request:Request)
         bearer_token = request.headers.get("Authorization")
         user = request.state.user
 
-        check_jwt_user_auth(user, request.username)
+        check_jwt_user_auth(user, account_create_request.username)
         account = create_account_service(account_create_request, bearer_token)
     except JwtPermissionError:
         return JSONResponse(

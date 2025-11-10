@@ -84,3 +84,6 @@ INSERT INTO accounts (
 
 INSERT INTO account_types (code, "name")
 VALUES ('SA001', 'SAVING');
+
+INSERT INTO account_types (code, "name")
+VALUES ('CK001', 'CHECKING');

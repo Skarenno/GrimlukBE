@@ -10,7 +10,7 @@ ISSUER = os.getenv("JWT_ISSUER")
 
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 180
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -25,11 +25,11 @@ def generate_jwt(username: str):
         "sub" : username,
         "iss" : ISSUER
     }
-    return create_access_token(user_data)
+    return (create_access_token(user_data), create_access_token(user_data, expires_delta=timedelta(minutes=480)))
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
-    expire = datetime.now() + (expires_delta or timedelta(minutes=15))
+    expire = datetime.now() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
