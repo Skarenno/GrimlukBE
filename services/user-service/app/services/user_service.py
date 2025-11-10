@@ -20,7 +20,8 @@ def register_user_service(request:UserLoginRequest):
     )
 
     new_user = add_user_credentials(new_user)
-    return generate_jwt(new_user.username)
+    (access_token, refresh_token) = generate_jwt(new_user.username)
+    return [access_token, refresh_token]
 
 
 def login_user_service(request:UserLoginRequest, ip_address:str):
@@ -34,7 +35,8 @@ def login_user_service(request:UserLoginRequest, ip_address:str):
 
     db_user_info = get_user_info_by_username(request.username)
     insert_access_log(request,ip_address)
-    return (generate_jwt(db_user_credentials.username), map_user_db_to_response(db_user_info))
+    (access_token, refresh_token) = generate_jwt(db_user_credentials.username)
+    return (access_token, refresh_token, map_user_db_to_response(db_user_info))
 
 def get_user_info_service(user_id:int):
     db_user = get_user_info_by_user_id(user_id)

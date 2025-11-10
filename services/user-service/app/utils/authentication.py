@@ -25,7 +25,7 @@ def generate_jwt(username: str):
         "sub" : username,
         "iss" : ISSUER
     }
-    return create_access_token(user_data)
+    return (create_access_token(user_data), create_access_token(user_data, expires_delta=timedelta(minutes=480)))
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
