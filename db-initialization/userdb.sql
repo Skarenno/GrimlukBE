@@ -43,8 +43,8 @@ CREATE TABLE public.access_log (
 
 
 -- TEST DATA INSERTION
-INSERT INTO public."user" (id,username,tax_code,"name",surname,birth_date, mail,phone,gender, residence_address_1, residence_address_2, postal_code, city, country, province) VALUES
-	 ('1','zqaz1234@gmail.com','TSTBVN99S04F839N','Bonaventura Salvatore','Testa','1999-11-04 00:00:00','zqaz1234@gmail.com','3755222244','M', 'VIA CAPPELLA III TRAV', NULL, '80070', 'MONTE DI PROCIDA', 'ITALY', 'NA');
+INSERT INTO public."user" (username,tax_code,"name",surname,birth_date, mail,phone,gender, residence_address_1, residence_address_2, postal_code, city, country, province) VALUES
+	 ('zqaz1234@gmail.com','TSTBVN99S04F839N','Bonaventura Salvatore','Testa','1999-11-04 00:00:00','zqaz1234@gmail.com','3755222244','M', 'VIA CAPPELLA III TRAV', NULL, '80070', 'MONTE DI PROCIDA', 'ITALY', 'NA');
 
 INSERT INTO public.user_credentials
 (username, "password", created_at)

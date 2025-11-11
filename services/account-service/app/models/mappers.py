@@ -1,7 +1,7 @@
 import uuid
-from app.models.db_models import Account, AccountType
+from app.models.db_models import Account, AccountType, Card
 from app.models.request_models import AccountCreateRequest
-from app.models.response_models import AccountResponse, AccountTypeResponse
+from app.models.response_models import AccountResponse, AccountTypeResponse, CardResponse
 
 def map_account_create_to_db(request: AccountCreateRequest) -> Account:
     # Generate an IBAN-like account number or UUID-based identifier
@@ -28,3 +28,6 @@ def map_account_db_to_response(db_account: Account) -> AccountResponse:
 
 def map_account_type_db_to_response(db_account_type: AccountType) -> AccountTypeResponse:
     return AccountTypeResponse.model_validate(db_account_type)
+
+def map_card_db_to_response(db_card: Card) -> CardResponse:
+    return CardResponse.model_validate(db_card)

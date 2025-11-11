@@ -31,15 +31,24 @@ CREATE INDEX idx_accounts_username ON accounts (username);
 -- Card table
 CREATE TABLE cards (
     id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-    card_number VARCHAR(20) UNIQUE NOT NULL,
-    card_type VARCHAR(50) NOT NULL,
-    expiration_date DATE NOT NULL,
-    cvv VARCHAR(4) NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    user_id INTEGER NOT NULL,
+    account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+    last4 CHAR(4) NOT NULL,
+    cardholder_name VARCHAR(100) NOT NULL,
+    expiry_month SMALLINT NOT NULL CHECK (expiry_month BETWEEN 1 AND 12),
+    expiry_year SMALLINT NOT NULL,
+    card_type VARCHAR(20) NOT NULL,
+    network VARCHAR(20),
+    issuer VARCHAR(50),
+    daily_limit INTEGER,
+    online_payments_enabled BOOLEAN,
+    status VARCHAR(20) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_used_at TIMESTAMP DEFAULT NULL
 );
+
+
 
 CREATE TABLE account_types (
     code VARCHAR(5) PRIMARY KEY,
@@ -81,6 +90,40 @@ INSERT INTO accounts (
     'BR001',                       
     'CHK001'                       
 );
+
+
+INSERT INTO cards (
+    user_id,
+    account_id,
+    cardholder_name,
+    card_type,
+    network,
+    issuer,
+    last4,
+    expiry_month,
+    expiry_year,
+    status,
+    daily_limit,
+    online_payments_enabled,
+    created_at,
+    last_used_at
+) VALUES (
+    1,                         -- user_id
+    1,                         -- account_id (linked to the account above)
+    'John D. Smith',           -- cardholder_name
+    'debit',                   -- card_type
+    'Visa',                    -- network
+    'National Bank',           -- issuer
+    '1234',                    -- last4 digits
+    8,                         -- expiry_month
+    2028,                      -- expiry_year
+    'active',                  -- status
+    2000.00,                   -- daily_limit
+    TRUE,                      -- online_payments_enabled
+    NOW(),
+    NOW()                      -- last_used_at
+);
+
 
 INSERT INTO account_types (code, "name")
 VALUES ('SA001', 'SAVING');
