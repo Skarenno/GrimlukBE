@@ -35,7 +35,7 @@ async def login(user_request: UserLoginRequest, request:Request):
     except (UserDoesNotExistError, PasswordInvalidError):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content= {"detail" : "Invalid username or password"}
+            content= {"error" : "Invalid username or password"}
         )
     
     return JSONResponse(
@@ -55,7 +55,7 @@ async def register(register_request: UserRegisterRequest):
     except UserAlreadyExistsError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": f"User {register_request.userCredentials.username} already registered"}
+            content={"error": f"User {register_request.userCredentials.username} already registered"}
         )
     
     return JSONResponse(
@@ -91,12 +91,12 @@ async def update_user_info(update_user_request: UserInfoRequest, request:Request
     except UserDoesNotExistError:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-             content={"detail":f"User {update_user_request.username} not found"}
+             content={"error":f"User {update_user_request.username} not found"}
         )
     except JwtPermissionError:
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content={"detail" : "Authorization error: cannot query other users"}
+            content={"error" : "Authorization error: cannot query other users"}
         )
 
     return JSONResponse(
@@ -112,12 +112,12 @@ async def get_user_info(user_id:int, request:Request):
     except UserDoesNotExistError:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-             content={"detail":f"User {user_id} not found"}
+             content={"error":f"User {user_id} not found"}
         )
     except JwtPermissionError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail" : "Authorization error: cannot query other users"}
+            content={"error" : "Authorization error: cannot query other users"}
         )
 
     return JSONResponse(
@@ -137,12 +137,12 @@ async def middleware(request: Request, call_next):
         except JWTError as je:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : "Token is not valid - " + str(je)}
+                content= {"error" : "Token is not valid - " + str(je)}
             )
         except:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : "Error while decoding token"}
+                content= {"error" : "Error while decoding token"}
             )
     
     try:
@@ -150,7 +150,7 @@ async def middleware(request: Request, call_next):
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content= {"detail" : "Unexpected error - " + str(e)}
+            content= {"error" : "Unexpected error - " + str(e)}
         )
         
 origins = [

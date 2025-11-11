@@ -94,12 +94,12 @@ async def middleware(request: Request, call_next):
         except JWTError as je:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : "Token is not valid - " + str(je)}
+                content= {"error" : "Token is not valid - " + str(je)}
             )
         except:
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content= {"detail" : "Error while decoding token"}
+                content= {"error" : "Error while decoding token"}
             )
     
     try:
@@ -107,7 +107,7 @@ async def middleware(request: Request, call_next):
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content= {"detail" : "Unexpected error - " + str(e)}
+            content= {"error" : "Unexpected error - " + str(e)}
         )
     
 origins = [
