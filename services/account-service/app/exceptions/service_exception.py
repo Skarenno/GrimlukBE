@@ -6,3 +6,6 @@ class UserDoesNotExistError(Exception):
 
 class UserServiceError(Exception):
     pass
+
+class AccountRetrievalError(Exception):
+    pass

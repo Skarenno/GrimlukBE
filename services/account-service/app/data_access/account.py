@@ -41,3 +41,7 @@ def insert_account(account:Account):
 def get_accounts_by_userid(user_id:int):
     with SessionLocal() as db:
         return db.query(Account).filter(Account.user_id == user_id).all()
+
+def get_account_by_id(accountid:int): 
+    with SessionLocal() as db:
+        return db.query(Account).filter(Account.id == accountid).first()

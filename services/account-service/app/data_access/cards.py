@@ -17,3 +17,14 @@ def open_db():
 def get_cards_by_user_id(user_id:int):
     with SessionLocal() as db:
         return db.query(Card).filter(Card.user_id == user_id).all()
+    
+def insert_card(card:Card):
+    with SessionLocal() as db:
+        if card in db:
+            raise KeyError
+        
+        db.add(card)
+        db.commit()
+        db.refresh(card)
+
+    return card

@@ -2,7 +2,7 @@ import os
 from app.models.request_models import AccountCreateRequest
 from app.models.response_models import AccountResponse
 from app.models.mappers import map_account_create_to_db, map_account_db_to_response, map_account_type_db_to_response
-from app.data_access.account import insert_account, get_accounts_by_userid
+from app.data_access.account import insert_account, get_accounts_by_userid, get_account_by_id
 from app.data_access.account_types import get_all_account_types
 from app.exceptions.service_exception import AccountLimitError, UserDoesNotExistError
 from app.external.user_service import check_user_valid
@@ -34,6 +34,9 @@ def get_accounts_service(userid: int, bearer_token:str) -> list[AccountResponse]
     
     accounts = get_accounts_by_userid(userid)
     return [map_account_db_to_response(account) for account in accounts]
+
+def get_account_by_id(accountid:int) -> AccountResponse:
+    return map_account_db_to_response(get_account_by_id(accountid))
 
 def get_account_types():
     account_types = get_all_account_types()
