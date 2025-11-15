@@ -28,3 +28,16 @@ def insert_card(card:Card):
         db.refresh(card)
 
     return card
+
+def get_card_by_id(card_id: int):
+    with SessionLocal() as db:
+        return db.query(Card).filter(Card.id == card_id).first()
+    
+def update_card(card:Card):
+    with SessionLocal() as db:
+        
+        merged = db.merge(card)
+        db.commit()
+        db.refresh(merged)
+
+    return merged
