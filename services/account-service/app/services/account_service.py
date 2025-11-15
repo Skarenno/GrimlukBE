@@ -35,7 +35,7 @@ def get_accounts_service(userid: int, bearer_token:str) -> list[AccountResponse]
     accounts = get_accounts_by_userid(userid)
     return [map_account_db_to_response(account) for account in accounts]
 
-def get_account_by_id(accountid:int) -> AccountResponse:
+def get_account(accountid:int) -> AccountResponse:
     return map_account_db_to_response(get_account_by_id(accountid))
 
 def get_account_types():

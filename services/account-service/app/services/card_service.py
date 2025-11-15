@@ -17,7 +17,8 @@ def get_cards_service(userid: int) -> list[CardResponse]:
 
 def create_card_service(createRequest:CardCreateRequest, bearer_token:str):
     check_request(createRequest, bearer_token)
-    insert_card(map_card_create_to_db(createRequest))
+    db_card = insert_card(map_card_create_to_db(createRequest))
+    return map_card_db_to_response(db_card)
 
 
 def check_request(createRequest:CardCreateRequest, bearer_token:str):
