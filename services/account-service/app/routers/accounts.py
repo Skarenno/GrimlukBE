@@ -34,8 +34,9 @@ def get_types(request:Request):
     account_types = get_account_types_service()
     return account_types
 
-@router.post("/delete")
+@router.post("/delete", response_model=AccountResponse)
 def delete_account(delet_account_request:DeleteAccountRequest, request:Request):
     bearer_token = request.headers.get("Authorization")
-    delete_account_service(delet_account_request, bearer_token)
-    return JSONResponse(status_code=status.HTTP_200_OK)
+    deleted_account = delete_account_service(delet_account_request, bearer_token)
+    return deleted_account
+    

@@ -75,4 +75,4 @@ class CardUpdateRequest(BaseModel):
     
 class DeleteAccountRequest(BaseModel):
     deleteId:int
-    transferId:int
+    transferId:int | None = None

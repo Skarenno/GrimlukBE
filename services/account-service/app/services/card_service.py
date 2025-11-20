@@ -7,6 +7,7 @@ from app.external.user_service import check_user_valid
 from app.exceptions.service_exception import AccountRetrievalError, UserDoesNotExistError, CardRetrievalError
 from app.models.request_models import CardCreateRequest, CardUpdateRequest
 from app.models.mappers import map_card_db_to_response, map_card_create_to_db
+from app.utils.enums import AccountStatus
 
 ACCOUNT_LIMIT = os.getenv("ACCOUNT_LIMIT")
 
@@ -46,7 +47,7 @@ def check_request(createRequest:CardCreateRequest, bearer_token:str):
 
     account = get_account_by_id(createRequest.account_id)
 
-    if not account:
+    if not account or account.status == AccountStatus.DELETED.value:
         raise AccountRetrievalError
 
     if account.user_id != createRequest.user_id:
