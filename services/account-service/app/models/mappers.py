@@ -42,6 +42,7 @@ def map_card_create_to_db(request: CardCreateRequest) -> Card:
         network=request.network,
         issuer="Grimluk Banking",   
         
+        card_number = generated_number,
         last4=last4,
         expiry_month=expiry_month,
         expiry_year=expiry_year,

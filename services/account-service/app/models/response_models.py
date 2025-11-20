@@ -35,13 +35,14 @@ class CardResponse(BaseModel):
     network: Optional[str] = Field(None, description="Visa, MasterCard, Amex, etc.")
     issuer: Optional[str] = Field(None, description="Bank or institution name")
 
+    card_number: str
     last4: constr(min_length=4, max_length=4)  # type: ignore[valid-type]
     masked_number: Optional[str] = Field(None, example="**** **** **** 1234")
     expiry_month: int = Field(..., ge=1, le=12)
     expiry_year: int = Field(..., ge=2023, le=2100)
 
     status: str = Field("active", description="active / blocked / expired / lost")
-    is_virtual: bool = False
+    is_virtual: bool = True
     contactless_enabled: bool = True
     daily_limit: float = Field(0.00, ge=0)
     online_payments_enabled: bool = True

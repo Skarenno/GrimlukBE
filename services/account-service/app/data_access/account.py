@@ -4,7 +4,8 @@ from app.models.request_models import *
 from app.models.db_models import Account, Card
 from app.exceptions.authentication_exception import *
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
 
 DB_URL = os.getenv("DATABASE_URL")
 db_engine = create_engine(DB_URL)
@@ -18,19 +19,17 @@ def open_db():
         db.close()  
 
 
-def upsert_account(account:Account):
+def update_account(account:Account):
+    account.updated_at = datetime.now()
     with SessionLocal() as db:
-        if account not in db:
-            db.add(account)
-
+        
+        updated = db.merge(account)
         db.commit()
-        db.refresh(account)
-        return account
+        db.refresh(updated)
+        return updated
     
 def insert_account(account:Account):
     with SessionLocal() as db:
-        if account in db:
-            raise KeyError
         
         db.add(account)
         db.commit()

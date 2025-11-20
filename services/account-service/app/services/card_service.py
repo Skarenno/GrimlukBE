@@ -33,7 +33,6 @@ def update_card_service(card_id:int, updateRequest:CardUpdateRequest, bearer_tok
 
     for field, value in field_updates.items():
         setattr(db_card, field, value)
-    db_card.updated_at = datetime.now()
 
     updated = update_card(db_card)
     if not updated:

@@ -72,3 +72,7 @@ class CardUpdateRequest(BaseModel):
         
 
         return daily_limit
+    
+class DeleteAccountRequest(BaseModel):
+    deleteId:int
+    transferId:int

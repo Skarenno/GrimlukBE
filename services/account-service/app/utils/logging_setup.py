@@ -19,7 +19,7 @@ def register_exception_handlers(app):
         )
         return JSONResponse(
             status_code=401,
-            content={"error": "Authorization error: cannot create for other users"},
+            content={"error": "Authorization error - cannot permit this operation"},
         )
 
     @app.exception_handler(UserDoesNotExistError)
@@ -32,7 +32,7 @@ def register_exception_handlers(app):
         )
         return JSONResponse(
             status_code=401,
-            content={"error": "Authorization error: user does not exist"},
+            content={"error": "Authorization error - user does not exist"},
         )
 
     @app.exception_handler(UserServiceError)
@@ -45,7 +45,7 @@ def register_exception_handlers(app):
         )
         return JSONResponse(
             status_code=500,
-            content={"error": "Service error: cannot retrieve user information"},
+            content={"error": "Authorization error - cannot retrieve user information"},
         )
 
     @app.exception_handler(AccountLimitError)
@@ -58,9 +58,35 @@ def register_exception_handlers(app):
         )
         return JSONResponse(
             status_code=200,
-            content={"error": "Account error: account limit reached for user"},
+            content={"error": "Account error - account limit reached for user"},
         )
 
+    @app.exception_handler(CardRetrievalError)
+    async def card_retrieval_handler(request: Request, exc: AccountLimitError):
+        logger.exception(
+            "CardRetrievalError at %s %s",
+            request.method,
+            request.url.path,
+            exc_info=exc,
+        )
+        return JSONResponse(
+            status_code=200,
+            content={"error": "Card error - could not retrieve cards information"},
+        )
+    
+    @app.exception_handler(AccountRetrievalError)
+    async def card_retrieval_handler(request: Request, exc: AccountLimitError):
+        logger.exception(
+            "AccountRetrievalError at %s %s",
+            request.method,
+            request.url.path,
+            exc_info=exc,
+        )
+        return JSONResponse(
+            status_code=200,
+            content={"error": "Account error - could not retrieve accunt information"},
+        )
+    
     @app.exception_handler(Exception)
     async def generic_handler(request: Request, exc: Exception):
         logger.exception(

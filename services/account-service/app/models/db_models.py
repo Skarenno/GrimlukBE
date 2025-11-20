@@ -40,6 +40,7 @@ class Card(Base):
     user_id = Column(Integer, nullable=False)
     account_id = Column(Integer, ForeignKey("accounts.id", ondelete="CASCADE"), nullable=False)
 
+    card_number = Column(String(16), nullable=False )
     last4 = Column(String(4), nullable=False)
     cardholder_name = Column(String(100), nullable=False)
     expiry_month = Column(Integer, nullable=False)

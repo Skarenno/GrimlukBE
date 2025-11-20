@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi import status
 from app.models.request_models import *
 from app.models.response_models import *
-from app.services.account_service import create_account_service, get_accounts_service, get_account_types
+from app.services.account_service import create_account_service, get_accounts_service, get_account_types_service, delete_account_service
 from app.utils.authentication import check_jwt_user_auth
 from app.exceptions.authentication_exception import *
 from app.exceptions.service_exception import *
@@ -31,7 +31,11 @@ def get_user_accounts(user_id: int, request:Request):
     
 @router.get("/getAccountTypes", response_model=list[AccountTypeResponse])
 def get_types(request:Request):
-    account_types = get_account_types()
+    account_types = get_account_types_service()
     return account_types
 
-
+@router.post("/delete")
+def delete_account(delet_account_request:DeleteAccountRequest, request:Request):
+    bearer_token = request.headers.get("Authorization")
+    delete_account_service(delet_account_request, bearer_token)
+    return JSONResponse(status_code=status.HTTP_200_OK)

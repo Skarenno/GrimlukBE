@@ -2,6 +2,7 @@ import os
 from app.models.db_models import  Card
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime
 
 DB_URL = os.getenv("DATABASE_URL")
 db_engine = create_engine(DB_URL)
@@ -17,6 +18,10 @@ def open_db():
 def get_cards_by_user_id(user_id:int):
     with SessionLocal() as db:
         return db.query(Card).filter(Card.user_id == user_id).all()
+    
+def get_cards_by_account_id(account_id:int):
+    with SessionLocal() as db:
+        return db.query(Card).filter(Card.account_id == account_id).all()  
     
 def insert_card(card:Card):
     with SessionLocal() as db:
@@ -34,6 +39,7 @@ def get_card_by_id(card_id: int):
         return db.query(Card).filter(Card.id == card_id).first()
     
 def update_card(card:Card):
+    card.updated_at = datetime.now()
     with SessionLocal() as db:
         
         merged = db.merge(card)

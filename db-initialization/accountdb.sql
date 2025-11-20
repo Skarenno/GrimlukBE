@@ -33,6 +33,7 @@ CREATE TABLE cards (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+    card_number VARCHAR(16) NOT NULL,
     last4 CHAR(4) NOT NULL,
     cardholder_name VARCHAR(100) NOT NULL,
     expiry_month SMALLINT NOT NULL CHECK (expiry_month BETWEEN 1 AND 12),
@@ -99,6 +100,7 @@ INSERT INTO cards (
     card_type,
     network,
     issuer,
+    card_number,
     last4,
     expiry_month,
     expiry_year,
@@ -114,6 +116,7 @@ INSERT INTO cards (
     'debit',                   -- card_type
     'Visa',                    -- network
     'National Bank',           -- issuer
+    '1234123412341234',      -- card_number
     '1234',                    -- last4 digits
     8,                         -- expiry_month
     2028,                      -- expiry_year
