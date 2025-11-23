@@ -123,7 +123,7 @@ class UserRegisterRequest(BaseModel):
     def validatePasswordStrength(cls, userCredentials:UserLoginRequest) -> UserLoginRequest:
         password = userCredentials.password
         password_pattern = re.compile(
-            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$'
+            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}$'
         )
 
         if (not password_pattern.match(password)):

@@ -1,9 +1,9 @@
 import uuid
 import random
 from datetime import datetime
-from app.models.db_models import Account, AccountType, Card
+from app.models.db_models import Account, AccountType, Card, BranchCode
 from app.models.request_models import AccountCreateRequest, CardCreateRequest
-from app.models.response_models import AccountResponse, AccountTypeResponse, CardResponse
+from app.models.response_models import AccountResponse, AccountTypeResponse, CardResponse, BranchCodeResponse
 
 def map_account_create_to_db(request: AccountCreateRequest) -> Account:
     account_number = f"IT00-{uuid.uuid4().hex[:20].upper()}"
@@ -62,6 +62,9 @@ def map_account_db_to_response(db_account: Account) -> AccountResponse:
 
 def map_account_type_db_to_response(db_account_type: AccountType) -> AccountTypeResponse:
     return AccountTypeResponse.model_validate(db_account_type)
+
+def map_branch_codes_db_to_response(db_branch_code: BranchCode) -> BranchCodeResponse:
+    return BranchCodeResponse.model_validate(db_branch_code)
 
 def map_card_db_to_response(db_card: Card) -> CardResponse:
     return CardResponse.model_validate(db_card)

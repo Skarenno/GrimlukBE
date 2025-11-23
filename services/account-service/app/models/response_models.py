@@ -61,3 +61,10 @@ class AccountTypeResponse(BaseModel):
     name: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class BranchCodeResponse(BaseModel):
+    code: str
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)

@@ -22,7 +22,7 @@ services:
       - DATABASE_URL=postgresql://user:password@db:5432/accountdb
       - JWT_KEY=ilbuiooltrelasiepe
       - JWT_ISSUER=grimluk-finance.com
-      - ACCOUNT_LIMIT=2
+      - ACCOUNT_LIMIT=3
       - USER_SERVICE_URL=http://user-service:8001
     depends_on:
       - db

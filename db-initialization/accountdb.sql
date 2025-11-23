@@ -56,6 +56,10 @@ CREATE TABLE account_types (
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
+CREATE TABLE branch_codes (
+    code VARCHAR(5) PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
 
 
 -- TESTING DATA -----------------------------------
@@ -130,6 +134,12 @@ INSERT INTO cards (
 
 INSERT INTO account_types (code, "name")
 VALUES ('SA001', 'SAVING');
-
 INSERT INTO account_types (code, "name")
 VALUES ('CK001', 'CHECKING');
+
+INSERT INTO branch_codes (code, "name")
+VALUES ('NA001', 'NAPOLI_01');
+INSERT INTO branch_codes (code, "name")
+VALUES ('NA002', 'NAPOLI_02');
+INSERT INTO branch_codes (code, "name")
+VALUES ('RM001', 'ROMA_01');

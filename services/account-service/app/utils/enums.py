@@ -2,7 +2,7 @@ from enum import Enum
 
 class NetworkTypes(str, Enum):
     VIZA = "VIZA"
-    MAZTER = "MAZTERCARDZ"
+    MAZTERCARDZ = "MAZTERCARDZ"
 
 class CardStatus(str, Enum):
     ACTIVE = "active"

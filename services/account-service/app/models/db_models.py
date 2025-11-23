@@ -78,3 +78,10 @@ class AccountType(Base):
 
     code = Column(String(5), primary_key=True)
     name = Column(String(50))
+
+
+class BranchCode(Base):
+    __tablename__ = "branch_codes"
+
+    code = Column(String(5), primary_key=True)
+    name = Column(String(50))

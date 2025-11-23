@@ -5,6 +5,7 @@ from app.models.db_models import Account, Card
 from app.exceptions.authentication_exception import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from app.utils.enums import AccountStatus
 from datetime import datetime
 
 DB_URL = os.getenv("DATABASE_URL")
@@ -40,6 +41,11 @@ def insert_account(account:Account):
 def get_accounts_by_userid(user_id:int):
     with SessionLocal() as db:
         return db.query(Account).filter(Account.user_id == user_id).all()
+    
+    
+def get_active_accounts_by_userid(user_id:int):
+    with SessionLocal() as db:
+        return db.query(Account).filter(Account.user_id == user_id, Account.status == AccountStatus.ACTIVE.value ).all()
 
 def get_account_by_id(accountid:int): 
     with SessionLocal() as db:
