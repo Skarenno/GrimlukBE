@@ -1,7 +1,7 @@
 from app.core.http_client import http_request
 from app.core.config import settings
 from app.models.responses.user_responses import (
-    LoginResponse, UserPublicInfo, RefreshTokenResponse
+    LoginResponse, UserPublicInfo, RefreshTokenResponse, SuccessResponse
 )
 from app.models.requests.user_requests import UserInfoRequest
 
@@ -40,5 +40,5 @@ async def refresh_token(token: str) -> RefreshTokenResponse:
 
 async def update_user_info(userInfoRequest: UserInfoRequest, token:str):
     url = f"{settings.USER_SERVICE_URL}/user/updateUserInfo"
-    data = await http_request("POST", url, json=userInfoRequest.model_dump_json(), token=token)
-    return UserPublicInfo.model_validate(data)
+    data = await http_request("POST", url, json=userInfoRequest.model_dump(), token=token)
+    return SuccessResponse.model_validate(data)

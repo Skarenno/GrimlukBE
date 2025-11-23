@@ -9,16 +9,17 @@ router = APIRouter(prefix="/card")
 
 @router.get("/getByUser/{user_id}", response_model=list[CardResponse])
 def get_user_cards_list(user_id: int, request:Request):
-    return get_cards_service(user_id)
+    jwt_user = request.state.user
+    return get_cards_service(user_id, jwt_payload=jwt_user)
 
 @router.post("/create", response_model=CardResponse, status_code=status.HTTP_201_CREATED)
 def create_card(createCardRequest:CardCreateRequest, request:Request):
-    bearer_token = request.headers.get("Authorization")
-    return create_card_service(createCardRequest, bearer_token)
+    jwt_user = request.state.user
+    return create_card_service(createCardRequest, jwt_user)
 
 @router.patch("/update/{card_id}")
 def update_card(card_id: int, updateCardRequest:CardUpdateRequest, request:Request):
-    bearer_token = request.headers.get("Authorization")
-    return update_card_service(card_id, updateCardRequest, bearer_token)
+    jwt_user = request.state.user
+    return update_card_service(card_id, updateCardRequest, jwt_user)
 
 

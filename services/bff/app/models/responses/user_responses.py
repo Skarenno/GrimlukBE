@@ -29,4 +29,4 @@ class RefreshTokenResponse(BaseModel):
     refresh_token: str
 
 class SuccessResponse(BaseModel):
-    detail: str
+    message: str

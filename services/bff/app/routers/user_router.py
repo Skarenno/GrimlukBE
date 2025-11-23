@@ -62,7 +62,7 @@ async def refresh(token: dict = Depends(get_jwt_from_request)):
 async def update(req: UserInfoRequest, token: dict = Depends(get_jwt_from_request)):
     try:
         await update_user_info(req, token)
-        return SuccessResponse(detail="User info updated successfully")
+        return SuccessResponse(message="User info updated successfully")
     except MicroserviceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     except MicroserviceUnavailableError:

@@ -39,13 +39,14 @@ async def bff_get_cards(user_id: int, token: dict = Depends(get_jwt_from_request
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Card service unavailable")
 
-@router.post("/update", response_model=CardResponse)
+@router.patch("/update/{card_id}", response_model=CardResponse)
 async def bff_update_card(
+    card_id:int,
     req: CardUpdateRequest,
     token: dict = Depends(get_jwt_from_request)
 ):
     try:
-        return await update_card(req, token)
+        return await update_card(card_id, req, token)
     except MicroserviceError as e:
         raise HTTPException(e.status_code, e.detail)
     except MicroserviceUnavailableError:

@@ -45,7 +45,7 @@ async def refresh(current_user=Depends(get_current_user)):
 @router.post("/updateUserInfo")
 async def update_info(req: UserInfoRequest, current_user=Depends(get_current_user)):
     upsert_user_info_service(req, current_user)
-    return {"detail": f"{req.username} updated correctly"}
+    return {"message": f"{req.username} updated correctly"}
 
 @router.get("/getUserInfo/{user_id}", response_model=UserInfoResponse)
 async def get_info(user_id: int, current_user=Depends(get_current_user)):

@@ -57,20 +57,13 @@ class CardUpdateRequest(BaseModel):
 
     @field_validator("daily_limit")
     @classmethod
-    def validate_daily_limi(cls, daily_limit: float) -> float:
-        if daily_limit < 500: 
+    def validate_daily_limit(cls, daily_limit: float | None) -> float | None:
+        if daily_limit is not None:
             if daily_limit <= 0:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Daily limit is not valid"
                 )
-        
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Daily limit must be 500 or higher"
-            )
-        
-
         return daily_limit
     
 class DeleteAccountRequest(BaseModel):

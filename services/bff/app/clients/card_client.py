@@ -28,10 +28,10 @@ async def get_cards_by_user(user_id: int, token: str):
     return [CardResponse.model_validate(c) for c in data]
 
 
-async def update_card(req: CardUpdateRequest, token: str):
+async def update_card(card_id:int, req: CardUpdateRequest, token: str):
     data = await http_request(
-        "POST",
-        f"{settings.ACCOUNT_SERVICE_URL}/card/update",
+        "PATCH",
+        f"{settings.ACCOUNT_SERVICE_URL}/card/update/{card_id}",
         token=token,
         json=req.model_dump(),
     )
