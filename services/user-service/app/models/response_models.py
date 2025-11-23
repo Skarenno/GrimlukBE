@@ -1,27 +1,42 @@
+from pydantic import BaseModel, Field
+from pydantic import ConfigDict
+from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
-from typing import Literal
-
-# Assuming GENDER is an enum like this:
-GENDER = Literal["M", "F", "O"]
 
 class UserInfoResponse(BaseModel):
     id: int
     username: str
-    tax_code: str
-    name: str
-    surname: str
-    phone: str | None = None
-    gender: GENDER | None = None            
-    residence_address_1: str | None = None  
-    residence_address_2: str | None = None
-    birth_date:datetime
-    city: str | None = None
-    province: str | None = None
-    postal_code: str | None = None
-    country: str | None = None
-
-    class Config:
-        from_attributes = True 
-
     
+    email: Optional[str] = Field(None, alias="mail")
+    first_name: Optional[str] = Field(None, alias="name")
+    last_name: Optional[str] = Field(None, alias="surname")
+    phone: Optional[str] = None
+    birth_date: Optional[datetime] = None
+    gender: Optional[str] = None
+
+    address_line_1: Optional[str] = Field(None, alias="residence_address_1")
+    address_line_2: Optional[str] = Field(None, alias="residence_address_2")
+    postal_code: Optional[str] = None
+    city: Optional[str] = None
+    province: Optional[str] = None
+    country: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+
+
+class LoginResponse(BaseModel):
+    jwt_token: str
+    refresh_token: str
+    user: UserInfoResponse
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RefreshTokenResponse(BaseModel):
+    jwt_token: str
+    refresh_token: str
+
+    model_config = ConfigDict(from_attributes=True)
+

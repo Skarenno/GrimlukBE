@@ -27,6 +27,21 @@ services:
     depends_on:
       - db
 
+
+  bff:
+    build: ./services/bff
+    container_name: bff
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/userdb
+      - JWT_KEY=ilbuiooltrelasiepe
+      - JWT_ISSUER=grimluk-finance.com
+      - USER_SERVICE_URL=http://user-service:8001
+      - ACCOUNT_SERVICE_URL=http://account-service:8002
+    depends_on:
+      - db
+      
 #  transaction-service:
 #    build: ./services/transaction-service
 #    container_name: transaction-service

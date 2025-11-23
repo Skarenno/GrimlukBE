@@ -3,8 +3,7 @@ from datetime import datetime
 from app.models.response_models import CardResponse
 from app.data_access.cards import get_cards_by_user_id, insert_card, get_card_by_id, update_card
 from app.services.account_service import get_account_by_id
-from app.external.user_service import check_user_valid
-from app.exceptions.service_exception import AccountRetrievalError, UserDoesNotExistError, CardRetrievalError
+from app.core.exceptions.service_exception import AccountRetrievalError, CardRetrievalError
 from app.models.request_models import CardCreateRequest, CardUpdateRequest
 from app.models.mappers import map_card_db_to_response, map_card_create_to_db
 from app.utils.enums import AccountStatus
@@ -18,7 +17,7 @@ def get_cards_service(userid: int) -> list[CardResponse]:
 
 
 def create_card_service(createRequest:CardCreateRequest, bearer_token:str):
-    check_request(createRequest, bearer_token)
+    check_request(createRequest)
     db_card = insert_card(map_card_create_to_db(createRequest))
     return map_card_db_to_response(db_card)
 
@@ -26,9 +25,6 @@ def update_card_service(card_id:int, updateRequest:CardUpdateRequest, bearer_tok
     db_card = get_card_by_id(card_id)
     if db_card is None:
         raise CardRetrievalError
-
-    if not check_user_valid(db_card.user_id, bearer_token):
-        raise UserDoesNotExistError
 
     field_updates = updateRequest.model_dump(exclude_unset=True)
 
@@ -41,10 +37,7 @@ def update_card_service(card_id:int, updateRequest:CardUpdateRequest, bearer_tok
     
     return map_card_db_to_response(updated)
 
-def check_request(createRequest:CardCreateRequest, bearer_token:str):
-    if not check_user_valid(createRequest.user_id, bearer_token):
-        raise UserDoesNotExistError
-
+def check_request(createRequest:CardCreateRequest):
     account = get_account_by_id(createRequest.account_id)
 
     if not account or account.status == AccountStatus.DELETED.value:

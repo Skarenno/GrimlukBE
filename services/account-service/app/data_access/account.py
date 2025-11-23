@@ -2,7 +2,6 @@ import os
 from fastapi import Depends
 from app.models.request_models import *
 from app.models.db_models import Account, Card
-from app.exceptions.authentication_exception import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.utils.enums import AccountStatus

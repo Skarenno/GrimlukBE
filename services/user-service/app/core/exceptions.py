@@ -1,3 +1,6 @@
+class JwtPermissionError(Exception):
+    pass
+
 class UserAlreadyExistsError(Exception):
     pass
 

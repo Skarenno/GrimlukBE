@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from fastapi import Request
+from fastapi import HTTPException, Request
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from app.exceptions.authentication_exception import JwtPermissionError
+from app.core.exceptions import JwtPermissionError
 import os
 
 SECRET_KEY = os.getenv("JWT_KEY")
@@ -20,10 +20,11 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
-def generate_jwt(username: str):
+def generate_jwt(username: str, id:int):
     user_data = {
         "sub" : username,
-        "iss" : ISSUER
+        "iss" : ISSUER,
+        "id": id
     }
     return (create_access_token(user_data), create_access_token(user_data, expires_delta=timedelta(minutes=480)))
 
@@ -52,3 +53,10 @@ def check_jwt_user_auth(jwt_payload:dict, username:str):
     user = jwt_payload.get("sub")
     if (user != username):
         raise JwtPermissionError
+
+def get_current_user(request: Request):
+    try:
+        payload = verify_JWT(request)
+        return payload
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or missing JWT")

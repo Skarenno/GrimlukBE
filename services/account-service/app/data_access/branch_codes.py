@@ -1,9 +1,8 @@
 import os
 from app.models.request_models import *
 from app.models.db_models import BranchCode
-from app.exceptions.authentication_exception import *
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 DB_URL = os.getenv("DATABASE_URL")
 db_engine = create_engine(DB_URL)

@@ -115,8 +115,6 @@ class UserRegisterRequest(BaseModel):
         validateBody(cls, user)
         return user
     
-
-
     
     @field_validator("userCredentials")
     @classmethod

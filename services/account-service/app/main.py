@@ -1,10 +1,8 @@
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.utils.logging_setup import register_exception_handlers
-from app.utils.authentication import verify_JWT
-from app.exceptions.authentication_exception import *
-from app.exceptions.service_exception import *
+from app.core.exceptions.exception_handler import register_exception_handlers
+from app.core.authentication import verify_JWT
 from jose import JWTError
 import logging
 
@@ -51,7 +49,6 @@ async def auth_middleware(request: Request, call_next):
             jwt_payload = verify_JWT(request)
             request.state.user = jwt_payload
         except JWTError as je:
-            # If you ALSO want to log JWT errors:
             logger.exception("JWTError at %s %s", request.method, request.url.path, exc_info=je)
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -63,8 +60,6 @@ async def auth_middleware(request: Request, call_next):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 content={"error": "Error while decoding token"},
             )
-
-    # ❗ Let exceptions from routes bubble to global handlers
     return await call_next(request)
 
 
