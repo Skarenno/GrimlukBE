@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn==0.22.0
 sqlalchemy
 psycopg2-binary
 pydantic
@@ -7,3 +7,4 @@ pydantic[email]
 python-jose[cryptography]>=3.3.0
 passlib
 requests
+confluent-kafka
