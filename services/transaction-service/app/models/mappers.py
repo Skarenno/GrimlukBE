@@ -6,8 +6,10 @@ def map_transaction_create_to_db(req: TransactionCreateRequest) -> Transaction:
     return Transaction(
         s_account_id=req.s_account_id,
         r_account_id=req.r_account_id,
-        s_account_number=req.sending_account_number,
+        s_account_number=req.s_account_number,
         r_account_number=req.r_account_number,
         amount=Decimal(str(req.amount)),  
-        description=req.description
+        description=req.description,
+        status="PENDING",
+        is_external = req.is_external
     )

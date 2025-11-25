@@ -6,7 +6,7 @@ from app.core.authentication import check_jwt_user_auth
 from app.data_access.transactions import insert_transaction
 from app.models.mappers import map_transaction_create_to_db
 from app.kafka.producer import KafkaProducer
-from app.models.kafka_models import TransactionCreatedEvent
+from app.events.handle_transaction_events import publish_transaction_pending
 
 kafka_producer = KafkaProducer()
 
@@ -17,19 +17,6 @@ def create_transaction_service(request:TransactionCreateRequest, jwt_user:dict) 
     if not transaction:
         raise TransactionError
     
-    event = TransactionCreatedEvent(
-        transaction_id=transaction.id,
-        user_id=request.user_id,
-        s_account_id=request.s_account_id,
-        sending_account_number=request.sending_account_number,
-        r_account_id=request.r_account_id,
-        r_account_number=request.r_account_number,
-        amount=request.amount,
-        description=request.description,
-        is_external=request.is_external
-    )
-
-    kafka_producer.send("transaction.pending", event.model_dump())
-    
+    publish_transaction_pending(transaction=transaction, user_id=request.user_id)
     return SuccessResponse(message="Transaction created")
 

@@ -23,7 +23,8 @@ services:
       - JWT_KEY=ilbuiooltrelasiepe
       - JWT_ISSUER=grimluk-finance.com
       - ACCOUNT_LIMIT=3
-      - USER_SERVICE_URL=http://user-service:8001
+      - KAFKA_SERVER=kafka:29092
+      - GROUP_ID=transaction-service
     depends_on:
       - db
 

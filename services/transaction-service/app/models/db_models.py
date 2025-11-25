@@ -18,6 +18,8 @@ class Transaction(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String)
     description = Column(String)
+    reject_reason = Column(String)
+    is_external =Column(Boolean)
 
 
     

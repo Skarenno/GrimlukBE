@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.exceptions.exception_handler import register_exception_handlers
 from app.core.authentication import verify_JWT
+from app.kafka.consumer import KafkaBackgroundConsumer
 from jose import JWTError
 import logging
 
@@ -62,6 +63,25 @@ async def auth_middleware(request: Request, call_next):
             )
     return await call_next(request)
 
+
+kafka_consumer = KafkaBackgroundConsumer(
+    topics=["transaction.pending"]  
+)
+
+
+@app.on_event("startup")
+def startup_event():
+    logger.info("Starting transaction-service…")
+    kafka_consumer.start()
+    logger.info("Kafka consumer initialized.")
+
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    logger.info("Stopping transaction-service…")
+    kafka_consumer.stop()
+    logger.info("Service shutdown complete.")
 
 origins = [
     "http://localhost:5173",

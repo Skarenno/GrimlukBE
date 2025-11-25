@@ -9,10 +9,12 @@ CREATE TABLE transactions (
     amount NUMERIC(15, 2) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     status VARCHAR DEFAULT 'PENDING',
-    description VARCHAR
+    reject_reason VARCHAR,
+    description VARCHAR,
+    is_external BOOLEAN
 );
 
 -- Useful indexes
 CREATE INDEX idx_transactions_s_account_id ON transactions (s_account_id);
 CREATE INDEX idx_transactions_r_account_id ON transactions (r_account_id);
-CREATE INDEX idx_transactions_timestamp ON transactions (timestamp);
+CREATE INDEX idx_transactions_timestamp ON transactions (created_at);

@@ -3,9 +3,10 @@ import threading
 import logging
 import time
 from confluent_kafka import Consumer, KafkaException, KafkaError
+from app.events.handle_events import handle_event
 import os
 import json
-from app.events.handle_events import handle_event
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

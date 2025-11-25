@@ -1,4 +1,5 @@
 
+from decimal import Decimal
 from fastapi import HTTPException, status
 from pydantic import BaseModel, model_validator
 import logging
@@ -9,10 +10,10 @@ logging.basicConfig(level=logging.INFO)
 class TransactionCreateRequest(BaseModel):
     user_id : int
     s_account_id: int
-    sending_account_number:str
+    s_account_number:str
     r_account_id: int | None = None
     r_account_number:str
-    amount:float
+    amount: Decimal
     description: str | None = None
     is_external:bool
 

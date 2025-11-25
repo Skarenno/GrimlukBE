@@ -27,7 +27,7 @@ app = FastAPI(
 
 # Init consumer instance
 kafka_consumer = KafkaBackgroundConsumer(
-    topics=["ACCOUNT_CREATED"]  
+    topics=["transaction.validated", "transaction.rejected"]  
 )
 
 

@@ -21,6 +21,19 @@ def insert_transaction(transaction:Transaction):
         db.add(transaction)
         db.commit()
         db.refresh(transaction)
-
+    
     return transaction
+
+
+def update_transaction(transaction:Transaction):
+    with SessionLocal() as db:
+        merged = db.merge(transaction)
+        db.commit()
+        db.refresh(merged)
+
+    return merged
+
+def get_transaction_by_id(id:int):
+    with SessionLocal() as db:
+        return db.query(Transaction).filter(Transaction.id == id).first()
 
