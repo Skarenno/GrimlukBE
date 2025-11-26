@@ -1,6 +1,7 @@
 from decimal import Decimal
 from app.models.db_models import Transaction  # adjust import to your structure
 from app.models.request_models import TransactionCreateRequest
+from app.models.response_models import TransactionResponse
 
 def map_transaction_create_to_db(req: TransactionCreateRequest) -> Transaction:
     return Transaction(
@@ -12,5 +13,10 @@ def map_transaction_create_to_db(req: TransactionCreateRequest) -> Transaction:
         description=req.description,
         status="PENDING",
         is_external = req.is_external,
-        is_blocking_account = req.is_blocking_account
+        is_blocking_account = req.is_blocking_account,
+        user_id = req.user_id
     )
+
+
+def map_transaction_db_to_response(db_transaction:Transaction) -> TransactionResponse:
+    return TransactionResponse.model_validate(db_transaction)

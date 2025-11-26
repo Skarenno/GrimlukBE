@@ -37,3 +37,6 @@ def get_transaction_by_id(id:int):
     with SessionLocal() as db:
         return db.query(Transaction).filter(Transaction.id == id).first()
 
+def get_transactions_by_user_id(user_id:int):
+    with SessionLocal() as db:
+        return db.query(Transaction).filter(Transaction.user_id == user_id).all()
