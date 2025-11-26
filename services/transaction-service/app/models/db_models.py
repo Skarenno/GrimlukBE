@@ -14,7 +14,7 @@ class Transaction(Base):
     r_account_id = Column(Integer)
     s_account_number = Column(String)
     r_account_number = Column(String)
-    user_id =Column(Integer)
+    s_user_id =Column(Integer)
     amount = Column(Numeric(15, 2), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String)

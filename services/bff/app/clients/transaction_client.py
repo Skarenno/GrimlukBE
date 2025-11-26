@@ -2,6 +2,7 @@ from app.core.http_client import http_request
 from app.core.config import settings
 from app.models.requests.transaction_requests import (
     TransactionCreateRequest,
+    TransactionAccountGetRequest
 )
 from app.models.responses.transaction_responses import (
     SuccessResponse,
@@ -23,6 +24,16 @@ async def get_by_user_id(user_id:int, token:dict) -> list[TransactionResponse]:
         "GET",
         f"{settings.TRANSACTION_SERVICE_URL}/transaction/getByUserId/{user_id}",
         token=token
+    )
+
+    return [TransactionResponse.model_validate(transaction) for transaction in data]
+
+async def get_transactions_by_accounts(req: TransactionAccountGetRequest, token:dict) -> list[TransactionResponse]:
+    data = await http_request(
+        "POST",
+        f"{settings.TRANSACTION_SERVICE_URL}/transaction/getByAccountList",
+        token=token,
+        json=req.model_dump(mode="json"),
     )
 
     return [TransactionResponse.model_validate(transaction) for transaction in data]

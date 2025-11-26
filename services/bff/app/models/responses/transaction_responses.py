@@ -8,7 +8,6 @@ class SuccessResponse(BaseModel):
 
 class TransactionResponse(BaseModel):
     id: int
-    s_account_id: Optional[int]
     s_account_number: Optional[str]
     r_account_number: Optional[str]
     amount: Decimal
@@ -18,6 +17,7 @@ class TransactionResponse(BaseModel):
     reject_reason: Optional[str]
     is_external: Optional[bool]
     is_blocking_account: Optional[bool]
+    direction:Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

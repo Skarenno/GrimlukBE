@@ -14,9 +14,12 @@ def map_transaction_create_to_db(req: TransactionCreateRequest) -> Transaction:
         status="PENDING",
         is_external = req.is_external,
         is_blocking_account = req.is_blocking_account,
-        user_id = req.user_id
+        s_user_id = req.user_id
     )
 
 
-def map_transaction_db_to_response(db_transaction:Transaction) -> TransactionResponse:
-    return TransactionResponse.model_validate(db_transaction)
+def map_transaction_db_to_response(db_transaction:Transaction, user_id:int) -> TransactionResponse:
+    direction = "OUT" if db_transaction.s_user_id == user_id else "IN"
+    mapped = TransactionResponse.model_validate(db_transaction)
+    mapped.direction = direction
+    return mapped

@@ -1,6 +1,5 @@
 
 from decimal import Decimal
-from fastapi import HTTPException, status
 from pydantic import BaseModel, model_validator
 from app.models.requests.request_validate_utils import validateBody
 import logging
@@ -27,3 +26,6 @@ class TransactionCreateRequest(BaseModel):
 
 
             
+class TransactionAccountGetRequest(BaseModel):
+    user_id:int
+    account_numbers: list[str]

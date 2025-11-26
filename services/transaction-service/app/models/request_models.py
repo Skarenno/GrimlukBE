@@ -31,6 +31,9 @@ class TransactionCreateRequest(BaseModel):
         validateBody(cls, transaction)
         return transaction
 
+class TransactionAccountGetRequest(BaseModel):
+    user_id:int
+    account_numbers: list[str]
 
 def validateBody(cls, body:dict):
     allowed_keys = cls.model_fields.keys()

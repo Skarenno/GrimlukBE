@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.authentication import get_jwt_from_request
 from app.core.exceptions.service_exceptions import MicroserviceError, MicroserviceUnavailableError
-from app.clients.transaction_client import create_transaction, get_by_user_id
+from app.clients.transaction_client import create_transaction, get_by_user_id, get_transactions_by_accounts
 from app.models.requests.transaction_requests import (
     TransactionCreateRequest,
+    TransactionAccountGetRequest
 )
 from app.models.responses.transaction_responses import (
     SuccessResponse,
@@ -36,4 +37,16 @@ async def get_transactions_by_user_id(
     except MicroserviceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     except MicroserviceUnavailableError:
-        raise HTTPException(503, "AccoTransactionunt service unavailable")
+        raise HTTPException(503, "Transaction service unavailable")
+
+@router.post("/getByAccountList", response_model=list[TransactionResponse], status_code=200)
+async def get_transactions_by_user_id(
+    req: TransactionAccountGetRequest,
+    token: str = Depends(get_jwt_from_request)
+):
+    try:
+        return await get_transactions_by_accounts(req, token)
+    except MicroserviceError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except MicroserviceUnavailableError:
+        raise HTTPException(503, "Transaction service unavailable")

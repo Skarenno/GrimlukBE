@@ -1,7 +1,7 @@
 import os
 from app.models.request_models import *
 from app.models.db_models import Transaction
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 
 DB_URL = os.getenv("DATABASE_URL")
@@ -39,4 +39,11 @@ def get_transaction_by_id(id:int):
 
 def get_transactions_by_user_id(user_id:int):
     with SessionLocal() as db:
-        return db.query(Transaction).filter(Transaction.user_id == user_id).all()
+        return db.query(Transaction).filter(Transaction.s_user_id == user_id).all()
+    
+def get_transactions_by_account_number(account_number:str):
+    with SessionLocal() as db:
+        return db.query(Transaction).filter(or_(
+            Transaction.r_account_number == account_number,
+            Transaction.s_account_number == account_number
+        )).all()
