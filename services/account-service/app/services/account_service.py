@@ -53,9 +53,6 @@ def delete_account_service(request:DeleteAccountRequest, jwt_user:dict):
     
     check_jwt_user_auth(jwt_payload=jwt_user, user_id=delete_accont.user_id)
 
-    transfer_account = get_account_by_id(request.transferId)
-    #transfer funds LOGIC TODO
-
 
     try:
         cards = get_cards_by_account_id(delete_accont.id)

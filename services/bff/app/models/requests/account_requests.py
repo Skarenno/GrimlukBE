@@ -24,7 +24,8 @@ class AccountCreateRequest(BaseModel):
 class DeleteAccountRequest(BaseModel):
     deleteId:int
     transferId:int | None = None
-
+    userId: int
+    
     @model_validator(mode='before')
     def validateAccountDelete(cls, user: dict):
         validateBody(cls, user)

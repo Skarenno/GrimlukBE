@@ -11,5 +11,6 @@ def map_transaction_create_to_db(req: TransactionCreateRequest) -> Transaction:
         amount=Decimal(str(req.amount)),  
         description=req.description,
         status="PENDING",
-        is_external = req.is_external
+        is_external = req.is_external,
+        is_blocking_account = req.is_blocking_account
     )

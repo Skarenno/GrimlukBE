@@ -1,4 +1,7 @@
-from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEvent, TransactionRejectedEvent
+from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEvent, TransactionRejectedEvent, RollbackAccountBlockingEvent
+from app.data_access.account import update_account
+from app.utils.enums import AccountStatus
+from app.kafka.topics import TRASACTION_VALIDATED, TRANSACTION_REJECTED
 from app.data_access.account import get_account_by_id
 from app.services.account_service import process_transaction
 from app.kafka.producer import KafkaProducer
@@ -52,6 +55,21 @@ def handle_transaction_pending(payload:dict):
     publish_transaction_validated(event=event)
 
 
+def handle_rollback_blocking(payload:dict):
+    event = RollbackAccountBlockingEvent(**payload)
+    account = get_account_by_id(event.account_id)
+
+    if not account:
+        logger.error(f"COULD NOT ROLLBACK ACCOUNT {event.account_id} - ACCOUNT NOT FOUND")
+        return
+    
+    if account.status != AccountStatus.DELETED.value:
+        logger.error(f"COULD NOT ROLLBACK ACCOUNT {event.account_id} - ACCOUNT STATUS INVALID")
+        return
+    
+    account.status = AccountStatus.ACTIVE.value
+    update_account(account=account)
+
 def publish_transaction_validated(event:TransactionCreatedEvent):
     validated = TransactionValidatedEvent(
         transaction_id=event.transaction_id,
@@ -60,7 +78,7 @@ def publish_transaction_validated(event:TransactionCreatedEvent):
         r_account_id=event.r_account_id
     )
 
-    kafka_producer.send("transaction.validated", validated.model_dump_json())
+    kafka_producer.send(TRASACTION_VALIDATED, validated.model_dump_json())
 
 
 def publish_transaction_rejected(event:TransactionCreatedEvent, reason:str):
@@ -72,5 +90,5 @@ def publish_transaction_rejected(event:TransactionCreatedEvent, reason:str):
         reason=reason
     )
 
-    kafka_producer.send("transaction.rejected", rejected.model_dump_json())
+    kafka_producer.send(TRANSACTION_REJECTED, rejected.model_dump_json())
 

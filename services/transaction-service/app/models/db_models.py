@@ -20,6 +20,6 @@ class Transaction(Base):
     description = Column(String)
     reject_reason = Column(String)
     is_external =Column(Boolean)
-
+    is_blocking_account = Column(Boolean)
 
     

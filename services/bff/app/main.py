@@ -4,7 +4,7 @@ from app.core.exceptions.exception_handler import register_exception_handlers
 from app.routers.user_router import router as user_router
 from app.routers.cards_router import router as card_router
 from app.routers.accounts_router import router as account_router
-
+from app.routers.transaction_router import router as transaction_router
 
 app = FastAPI(
     title="Banking BFF",
@@ -38,4 +38,4 @@ app.add_middleware(
 app.include_router(user_router)
 app.include_router(account_router)
 app.include_router(card_router)
-
+app.include_router(transaction_router)

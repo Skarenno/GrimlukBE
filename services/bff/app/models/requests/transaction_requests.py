@@ -2,6 +2,7 @@
 from decimal import Decimal
 from fastapi import HTTPException, status
 from pydantic import BaseModel, model_validator
+from app.models.requests.request_validate_utils import validateBody
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,6 @@ class TransactionCreateRequest(BaseModel):
     amount: Decimal
     description: str | None = None
     is_external:bool
-    is_blocking_account:bool
 
     @model_validator(mode="before")
     def validate_request(cls, transaction: dict):
@@ -32,19 +32,4 @@ class TransactionCreateRequest(BaseModel):
         return transaction
 
 
-def validateBody(cls, body:dict):
-    allowed_keys = cls.model_fields.keys()
-    body_keys =  body.keys()
-
-    logger.info(allowed_keys)
-    logger.info(body)
-
-    #Check for valid keys
-    for attribute in body_keys:
-        logger.info(f"attribute: {attribute}")
-        if not attribute in allowed_keys:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"{attribute} is not a valid key for {cls.__name__}"
-            )
-
+            

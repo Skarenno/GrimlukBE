@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class TransactionCreatedEvent(BaseModel):
-    event_name:str = "transaction.created"
+    event_name:str = "transaction.pending"
     transaction_id: int
     user_id: int
     s_account_id: int
@@ -29,3 +29,7 @@ class TransactionRejectedEvent(BaseModel):
     r_account_id: Optional[int]
     amount: Decimal
     reason:str
+
+class RollbackAccountBlockingEvent(BaseModel):
+    event_name:str = "account.rollback"
+    account_id:int

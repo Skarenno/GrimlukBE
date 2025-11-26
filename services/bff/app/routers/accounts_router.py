@@ -73,6 +73,7 @@ async def bff_delete_account(
     token: str = Depends(get_jwt_from_request)
 ):
     try:
+        await get_user_info(req.userId, token)
         return await delete_account(req, token)
     except MicroserviceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)

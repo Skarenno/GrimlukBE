@@ -1,6 +1,6 @@
 from app.kafka.producer import KafkaProducer
-from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEvent, TransactionRejectedEvent
-from app.kafka.topics import TRANSACTION_PENDING
+from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEvent, TransactionRejectedEvent, RollbackAccountBlockingEvent
+from app.kafka.topics import TRANSACTION_PENDING, ROLLBACK_ACCOUNT_BLOCK
 from app.data_access.transactions import update_transaction, get_transaction_by_id
 from app.models.db_models import Transaction
 import logging
@@ -29,7 +29,12 @@ def publish_transaction_pending(transaction:Transaction, user_id:int):
     
     return
 
-
+def publish_rollback_account_blocking(transaction:Transaction):
+    event = RollbackAccountBlockingEvent(
+        account_id=transaction.s_account_id
+    )
+    
+    kafka_producer.send(ROLLBACK_ACCOUNT_BLOCK, event.model_dump_json())
 
 def handle_transaction_rejected(payload:dict):
     event = TransactionRejectedEvent(**payload)
@@ -43,6 +48,9 @@ def handle_transaction_rejected(payload:dict):
     db_transaction.reject_reason = event.reason
 
     logging.info(f"UPDATING TRANSACTION {event.transaction_id} WITH REFECTED STATE")
+    if(db_transaction.is_blocking_account):
+        publish_rollback_account_blocking(db_transaction)
+        
     updated = update_transaction(db_transaction)
 
 
