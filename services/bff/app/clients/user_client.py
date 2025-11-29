@@ -17,8 +17,8 @@ async def user_register(credentials, info) -> LoginResponse:
     url = f"{settings.USER_SERVICE_URL}/user/register"
 
     payload = {
-        "userCredentials": credentials,
-        "userInfo": info
+        "userCredentials": credentials.model_dump(mode="json"),
+        "userInfo": info.model_dump(mode="json")
     }
 
     data = await http_request("POST", url, json=payload)
