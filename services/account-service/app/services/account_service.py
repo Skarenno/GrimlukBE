@@ -8,7 +8,8 @@ from app.data_access.cards import get_cards_by_account_id, update_card
 from app.data_access.account import insert_account, get_accounts_by_userid, get_account_by_id, update_account, get_active_accounts_by_userid
 from app.data_access.account_types import get_all_account_types
 from app.data_access.branch_codes import get_all_branch_codes
-from app.events.schemas import TransactionCreatedEvent
+from app.events.schemas import TransactionCreatedEvent, TransactionRequestedEvent
+from app.events.publish_events import publish_request_transfer
 from app.core.exceptions.service_exception import AccountLimitError, AccountRetrievalError, CardRetrievalError
 from app.utils.enums import CardStatus, AccountStatus
 from app.core.authentication import check_jwt_user_auth
@@ -62,17 +63,36 @@ def delete_account_service(request:DeleteAccountRequest, jwt_user:dict):
     except:
         raise CardRetrievalError
     
-    delete_accont.status = AccountStatus.DELETED.value
-    return map_account_db_to_response(update_account(delete_accont))
+    delete_accont.status = AccountStatus.IN_DELETION.value
+    deleted = map_account_db_to_response(update_account(delete_accont))
+    if (request.transferId):
+        transfer_account = get_account_by_id(request.transferId)
 
+        check_jwt_user_auth(jwt_user, transfer_account.user_id)
+        event= TransactionRequestedEvent(
+            user_id=request.userId,
+            amount=deleted.available_balance,
+            description="BLOCKING ACCOUNT",
+            is_blocking=True,
+            is_internal=True,
+            is_same_user=True,
+            s_account_id=deleted.id,
+            s_account_number=deleted.account_number,
+            r_account_id=transfer_account.id,
+            r_account_number=transfer_account.account_number
+        )
 
+        publish_request_transfer(event)
+
+    return deleted
 
 def process_transaction(event:TransactionCreatedEvent, s_account:Account, r_account:Account):
     amount = Decimal(str(event.amount))
 
     s_account.balance -= amount
     s_account.available_balance -= amount
-
+    if(event.is_blocking):
+        s_account.status = AccountStatus.DELETED.value
 
     update_account(account=s_account)
 

@@ -1,3 +1,4 @@
+TRANSACTION_REQUEST = "transaction.request"
 TRANSACTION_PENDING = "transaction.pending"
 TRASACTION_VALIDATED = "transaction.validated"
 TRANSACTION_REJECTED = "transaction.rejected"

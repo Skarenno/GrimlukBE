@@ -1,7 +1,9 @@
 from app.kafka.producer import KafkaProducer
-from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEvent, TransactionRejectedEvent, RollbackAccountBlockingEvent
+from app.events.schemas import TransactionCreatedEvent, TransactionRequestedEvent, TransactionValidatedEvent, TransactionRejectedEvent, RollbackAccountBlockingEvent
 from app.kafka.topics import TRANSACTION_PENDING, ROLLBACK_ACCOUNT_BLOCK
-from app.data_access.transactions import update_transaction, get_transaction_by_id
+from app.data_access.transactions import insert_transaction, update_transaction, get_transaction_by_id
+from app.models.mappers import map_request_transaction_event_to_db
+from app.core.exceptions.service_exception import TransactionError
 from app.models.db_models import Transaction
 from app.utils.enum_utils import TRANSACTION_STATUS
 import logging
@@ -24,6 +26,7 @@ def publish_transaction_pending(transaction:Transaction, user_id:int):
         amount=transaction.amount,
         description=transaction.description,
         is_internal=transaction.is_internal,
+        is_blocking=transaction.is_blocking_account,
         is_same_user=transaction.is_same_user
     )
 
@@ -37,6 +40,19 @@ def publish_rollback_account_blocking(transaction:Transaction):
     )
     
     kafka_producer.send(ROLLBACK_ACCOUNT_BLOCK, event.model_dump_json())
+
+
+
+def handle_transaction_requested(payload:dict):
+    event = TransactionRequestedEvent(**payload)
+    logger.info(f"INSERTING TRANSACTION DB FOR EVENT {event.event_name}")
+    transaction = insert_transaction(map_request_transaction_event_to_db(event))
+
+    if not transaction:
+        logger.info(f"COULD NOT INSERT TRANSACTION DB FOR EVENT {event.event_name}")
+        raise TransactionError
+    
+    publish_transaction_pending(transaction=transaction, user_id=event.user_id)
 
 def handle_transaction_rejected(payload:dict):
     event = TransactionRejectedEvent(**payload)

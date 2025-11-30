@@ -1,11 +1,12 @@
-from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEvent, TransactionRejectedEvent, RollbackAccountBlockingEvent
+from app.events.schemas import TransactionCreatedEvent, RollbackAccountBlockingEvent
 from app.data_access.account import update_account
 from app.utils.enums import AccountStatus
-from app.kafka.topics import TRASACTION_VALIDATED, TRANSACTION_REJECTED
 from app.data_access.account import get_account_by_id, get_account_by_account_number
 from app.services.account_service import process_transaction
 from app.kafka.producer import KafkaProducer
+from app.events.publish_events import publish_transaction_rejected, publish_transaction_validated
 import logging
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +31,7 @@ def handle_transaction_pending(payload:dict):
         logger.error(f"NOT_SUFFICIENT_FUNDS {event.amount} - event {event.event_name}")
         return publish_transaction_rejected(event=event, reason="NOT_SUFFICIENT_FUNDS")
     
-    if event.amount > s_account.credit_limit:
+    if not event.is_blocking and event.amount > s_account.credit_limit:
         logger.error(f"AMOUNT_OVER_LIMIT {s_account.credit_limit} - event {event.event_name}")
         return publish_transaction_rejected(event=event, reason="AMOUNT_OVER_LIMIT")
     
@@ -74,25 +75,4 @@ def handle_rollback_blocking(payload:dict):
     account.status = AccountStatus.ACTIVE.value
     update_account(account=account)
 
-def publish_transaction_validated(event:TransactionCreatedEvent):
-    validated = TransactionValidatedEvent(
-        transaction_id=event.transaction_id,
-        amount=event.amount,
-        s_account_id=event.s_account_id,
-        r_account_id=event.r_account_id
-    )
-
-    kafka_producer.send(TRASACTION_VALIDATED, validated.model_dump_json())
-
-
-def publish_transaction_rejected(event:TransactionCreatedEvent, reason:str):
-    rejected = TransactionRejectedEvent(
-        transaction_id=event.transaction_id,
-        amount=event.amount,
-        s_account_id=event.s_account_id,
-        r_account_id=event.r_account_id,
-        reason=reason
-    )
-
-    kafka_producer.send(TRANSACTION_REJECTED, rejected.model_dump_json())
 

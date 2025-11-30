@@ -5,7 +5,7 @@ from app.core.exceptions.exception_handler import register_exception_handlers
 from app.core.authentication import verify_JWT
 from app.kafka.consumer import KafkaBackgroundConsumer
 from jose import JWTError
-from app.kafka.topics import ROLLBACK_ACCOUNT_BLOCK, TRANSACTION_PENDING
+from app.kafka.topics import ROLLBACK_ACCOUNT_BLOCK, TRANSACTION_PENDING, TRANSACTION_REQUEST
 import logging
 
 from app.routers import accounts, cards

@@ -6,7 +6,7 @@ from app.core.authentication import verify_JWT
 from jose import JWTError
 from app.routers.transaction_router import router as transaction_router
 from app.kafka.consumer import KafkaBackgroundConsumer
-from app.kafka.topics import TRASACTION_VALIDATED, TRANSACTION_REJECTED
+from app.kafka.topics import TRASACTION_VALIDATED, TRANSACTION_REJECTED, TRANSACTION_REQUEST
 from app.core.exceptions.exception_handler import register_exception_handlers
 import logging
 
@@ -31,7 +31,7 @@ app = FastAPI(
 
 # Init consumer instance
 kafka_consumer = KafkaBackgroundConsumer(
-    topics=[TRASACTION_VALIDATED, TRANSACTION_REJECTED]  
+    topics=[TRASACTION_VALIDATED, TRANSACTION_REJECTED, TRANSACTION_REQUEST]  
 )
 
 

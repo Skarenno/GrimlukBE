@@ -10,4 +10,5 @@ class CardStatus(str, Enum):
 
 class AccountStatus(str, Enum):
     ACTIVE = "active"
+    IN_DELETION = "in deletion"
     DELETED = "deleted"
