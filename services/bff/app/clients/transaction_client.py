@@ -36,4 +36,5 @@ async def get_transactions_by_accounts(req: TransactionAccountGetRequest, token:
         json=req.model_dump(mode="json"),
     )
 
-    return [TransactionResponse.model_validate(transaction) for transaction in data]
+    transactions = [TransactionResponse.model_validate(transaction) for transaction in data]
+    return sorted(transactions, key= lambda transaction:transaction.created_at, reverse=True)

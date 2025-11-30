@@ -1,8 +1,9 @@
 import os
 from app.models.request_models import *
 from app.models.db_models import Transaction
-from sqlalchemy import create_engine, or_
+from sqlalchemy import and_, create_engine, or_
 from sqlalchemy.orm import sessionmaker
+from app.utils.enum_utils import TRANSACTION_STATUS
 
 DB_URL = os.getenv("DATABASE_URL")
 db_engine = create_engine(DB_URL)
@@ -41,9 +42,15 @@ def get_transactions_by_user_id(user_id:int):
     with SessionLocal() as db:
         return db.query(Transaction).filter(Transaction.s_user_id == user_id).all()
     
-def get_transactions_by_account_number(account_number:str):
+def get_transactions_by_account_number(account_numbers:list[str]):
     with SessionLocal() as db:
-        return db.query(Transaction).filter(or_(
-            Transaction.r_account_number == account_number,
-            Transaction.s_account_number == account_number
-        )).all()
+        return (
+            db.query(Transaction)
+            .filter(or_(
+                and_(Transaction.r_account_number.in_(account_numbers), Transaction.status == TRANSACTION_STATUS.VALIDATED.value),
+                Transaction.s_account_number.in_(account_numbers)
+            ))
+            .distinct(Transaction.id)
+            .all()
+        )
+

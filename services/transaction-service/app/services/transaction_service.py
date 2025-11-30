@@ -29,9 +29,7 @@ def get_transactions_by_user_id_service(user_id:int, jwt_user:dict) -> list[Tran
 
 def get_transactions_by_account_list_service(transactionRequest: TransactionAccountGetRequest, jwt_user:dict):
     check_jwt_user_auth(jwt_payload=jwt_user, user_id=transactionRequest.user_id)
-    transactions : list[Transaction] = []
-    
-    for account_number in transactionRequest.account_numbers:
-        transactions.extend(get_transactions_by_account_number(account_number))
+    account_numbers = transactionRequest.account_numbers
+    transactions = get_transactions_by_account_number(account_numbers)
 
     return [map_transaction_db_to_response(transaction, user_id=transactionRequest.user_id) for transaction in transactions]

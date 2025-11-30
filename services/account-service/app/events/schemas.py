@@ -13,7 +13,8 @@ class TransactionCreatedEvent(BaseModel):
     r_account_number: str
     amount: Decimal
     description: Optional[str]
-    is_external: bool
+    is_internal: bool
+    is_same_user: bool
 
 class TransactionValidatedEvent(BaseModel):
     event_name:str = "transaction.validated"

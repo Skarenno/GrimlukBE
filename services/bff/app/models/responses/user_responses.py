@@ -4,9 +4,8 @@ from typing import Optional
 class UserPublicInfo(BaseModel):
     id: int
     username: str
-    email: Optional[str] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
+    name: Optional[str] = None
+    surname: Optional[str] = None
     phone: Optional[str] = None
     birth_date: Optional[str] = None
     gender: Optional[str] = None

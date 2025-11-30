@@ -3,6 +3,7 @@ from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEven
 from app.kafka.topics import TRANSACTION_PENDING, ROLLBACK_ACCOUNT_BLOCK
 from app.data_access.transactions import update_transaction, get_transaction_by_id
 from app.models.db_models import Transaction
+from app.utils.enum_utils import TRANSACTION_STATUS
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,8 @@ def publish_transaction_pending(transaction:Transaction, user_id:int):
         r_account_number=transaction.r_account_number,
         amount=transaction.amount,
         description=transaction.description,
-        is_external=transaction.is_external
+        is_internal=transaction.is_internal,
+        is_same_user=transaction.is_same_user
     )
 
     kafka_producer.send(TRANSACTION_PENDING, event.model_dump_json())
@@ -44,7 +46,7 @@ def handle_transaction_rejected(payload:dict):
         logger.error(f"NO TRANSACTION WITH ID {event.transaction_id} FOUND")
         return
     
-    db_transaction.status = "REJECTED"
+    db_transaction.status = TRANSACTION_STATUS.REJECTED.value
     db_transaction.reject_reason = event.reason
 
     logging.info(f"UPDATING TRANSACTION {event.transaction_id} WITH REFECTED STATE")
@@ -64,7 +66,7 @@ def handle_transaction_validated(payload:dict):
         logger.error(f"NO TRANSACTION WITH ID {event.transaction_id} FOUND")
         return
     
-    db_transaction.status = "VALIDATED"
+    db_transaction.status = TRANSACTION_STATUS.VALIDATED.value
     logging.info(f"UPDATING TRANSACTION {event.transaction_id} WITH VALIDATED STATE")
     logger.info(f"STATUS = {db_transaction.status}")
     updated = update_transaction(db_transaction)

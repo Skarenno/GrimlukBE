@@ -12,14 +12,15 @@ def map_transaction_create_to_db(req: TransactionCreateRequest) -> Transaction:
         amount=Decimal(str(req.amount)),  
         description=req.description,
         status="PENDING",
-        is_external = req.is_external,
+        is_internal = req.is_internal,
+        is_same_user = req.is_same_user,
         is_blocking_account = req.is_blocking_account,
         s_user_id = req.user_id
     )
 
 
 def map_transaction_db_to_response(db_transaction:Transaction, user_id:int) -> TransactionResponse:
-    direction = "OUT" if db_transaction.s_user_id == user_id else "IN"
+    direction = "FLAT" if db_transaction.is_same_user else "OUT" if db_transaction.s_user_id == user_id else "IN"
     mapped = TransactionResponse.model_validate(db_transaction)
     mapped.direction = direction
     return mapped

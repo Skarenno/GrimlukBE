@@ -50,3 +50,6 @@ async def get_transactions_by_user_id(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Transaction service unavailable")
+    
+
+

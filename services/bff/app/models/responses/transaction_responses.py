@@ -15,7 +15,8 @@ class TransactionResponse(BaseModel):
     status: Optional[str]
     description: Optional[str]
     reject_reason: Optional[str]
-    is_external: Optional[bool]
+    is_internal: Optional[bool]
+    is_same_user: Optional[bool]
     is_blocking_account: Optional[bool]
     direction:Optional[str] = None
 

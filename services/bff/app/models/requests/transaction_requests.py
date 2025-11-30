@@ -15,7 +15,8 @@ class TransactionCreateRequest(BaseModel):
     r_account_number:str
     amount: Decimal
     description: str | None = None
-    is_external:bool
+    is_internal:bool
+    is_same_user:bool
     is_blocking_account:bool
 
     

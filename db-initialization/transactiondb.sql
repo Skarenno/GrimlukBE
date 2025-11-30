@@ -12,7 +12,8 @@ CREATE TABLE transactions (
     status VARCHAR DEFAULT 'PENDING',
     reject_reason VARCHAR,
     description VARCHAR,
-    is_external BOOLEAN,
+    is_internal BOOLEAN,
+    is_same_user BOOLEAN,
     is_blocking_account BOOLEAN
 );
 

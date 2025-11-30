@@ -7,6 +7,7 @@ from jose import JWTError
 from app.routers.transaction_router import router as transaction_router
 from app.kafka.consumer import KafkaBackgroundConsumer
 from app.kafka.topics import TRASACTION_VALIDATED, TRANSACTION_REJECTED
+from app.core.exceptions.exception_handler import register_exception_handlers
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,6 +17,8 @@ app = FastAPI(
     title="FastAPI + Kafka Microservice",
     version="1.0.0",
 )
+
+register_exception_handlers(app)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

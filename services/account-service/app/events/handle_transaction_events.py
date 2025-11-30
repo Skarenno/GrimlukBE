@@ -2,7 +2,7 @@ from app.events.schemas import TransactionCreatedEvent, TransactionValidatedEven
 from app.data_access.account import update_account
 from app.utils.enums import AccountStatus
 from app.kafka.topics import TRASACTION_VALIDATED, TRANSACTION_REJECTED
-from app.data_access.account import get_account_by_id
+from app.data_access.account import get_account_by_id, get_account_by_account_number
 from app.services.account_service import process_transaction
 from app.kafka.producer import KafkaProducer
 import logging
@@ -38,13 +38,17 @@ def handle_transaction_pending(payload:dict):
         logger.error(f"AMOUNT_INVALID: {event.amount} - event {event.event_name}")
         return publish_transaction_rejected(event=event, reason="AMOUNT_INVALID")  
 
-    if not event.is_external:
-        r_account = get_account_by_id(event.r_account_id)
+    if event.is_internal:
+        r_account = get_account_by_account_number(event.r_account_number)
         if not r_account or r_account.account_number != event.r_account_number:
             logger.error(f"RECEIVING_ACCOUNT_NOT_FOUND {event.r_account_number} - event {event.event_name}")
             return publish_transaction_rejected(event=event, reason="RECEIVING_ACCOUNT_NOT_FOUND")
         
-        
+        if event.is_same_user:
+            if not r_account.user_id == s_account.user_id:
+                logger.error(f"RECEIVING_ACCOUNT_NOT_LEGAL {event.r_account_number} - event {event.event_name}")
+                return publish_transaction_rejected(event=event, reason="RECEIVING_ACCOUNT_NOT_LEGAL")
+
     try:
         process_transaction(event, s_account, r_account)
     except Exception as e:

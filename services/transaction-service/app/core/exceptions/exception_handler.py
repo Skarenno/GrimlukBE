@@ -23,6 +23,18 @@ def register_exception_handlers(app):
         )
 
 
+    @app.exception_handler(TransactionError)
+    async def transaction_handler(request: Request, exc: JwtPermissionError):
+        logger.exception(
+            "TransactionError at %s %s",
+            request.method,
+            request.url.path,
+            exc_info=exc,
+        )
+        return JSONResponse(
+            status_code=401,
+            content={"error": "TransactionError error - cannot create transaction"},
+        )
     
     @app.exception_handler(Exception)
     async def generic_handler(request: Request, exc: Exception):

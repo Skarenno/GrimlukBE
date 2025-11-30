@@ -20,7 +20,8 @@ class Transaction(Base):
     status = Column(String)
     description = Column(String)
     reject_reason = Column(String)
-    is_external =Column(Boolean)
+    is_internal =Column(Boolean)
+    is_same_user = Column(Boolean)
     is_blocking_account = Column(Boolean)
 
     

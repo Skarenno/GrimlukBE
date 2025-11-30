@@ -15,17 +15,24 @@ class TransactionCreateRequest(BaseModel):
     r_account_number:str
     amount: Decimal
     description: str | None = None
-    is_external:bool
+    is_internal:bool
+    is_same_user:bool 
     is_blocking_account:bool
 
     @model_validator(mode="before")
     def validate_request(cls, transaction: dict):
-        if(transaction.get("is_external") == False):
+        if(transaction.get("is_same_user")):
             var_receiving_account_id = transaction.get("r_account_id")
             if(not var_receiving_account_id or var_receiving_account_id == 0):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Not a valid receiving account"
+                )
+            
+            if(not transaction.get("is_internal")):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot transaction same user externally"
                 )
 
         validateBody(cls, transaction)
