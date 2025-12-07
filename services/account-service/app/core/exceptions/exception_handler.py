@@ -63,7 +63,7 @@ def register_exception_handlers(app):
         )
     
     @app.exception_handler(AccountBlockingFundError)
-    async def card_retrieval_handler(request: Request, exc: AccountLimitError):
+    async def account_blocking_handler(request: Request, exc: AccountLimitError):
         logger.exception(
             "AccountBlockingFundError at %s %s",
             request.method,
