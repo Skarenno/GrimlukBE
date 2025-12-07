@@ -10,7 +10,7 @@ from app.data_access.account_types import get_all_account_types
 from app.data_access.branch_codes import get_all_branch_codes
 from app.events.schemas import TransactionCreatedEvent, TransactionRequestedEvent
 from app.events.publish_events import publish_request_transfer
-from app.core.exceptions.service_exception import AccountLimitError, AccountRetrievalError, CardRetrievalError
+from app.core.exceptions.service_exception import AccountBlockingFundError, AccountLimitError, AccountRetrievalError, CardRetrievalError
 from app.utils.enums import CardStatus, AccountStatus
 from app.core.authentication import check_jwt_user_auth
 
@@ -51,6 +51,9 @@ def delete_account_service(request:DeleteAccountRequest, jwt_user:dict):
     delete_accont = get_account_by_id(request.deleteId)
     if not delete_accont or delete_accont.status == AccountStatus.DELETED.value:
         raise AccountRetrievalError
+    
+    if(delete_accont.balance <= 0 and request.transferId):
+        raise AccountBlockingFundError
     
     check_jwt_user_auth(jwt_payload=jwt_user, user_id=delete_accont.user_id)
 
