@@ -10,8 +10,8 @@ class UserPublicInfo(BaseModel):
     phone: Optional[str] = None
     birth_date: Optional[str] = None
     gender: Optional[str] = None
-    address_line_1: Optional[str] = None
-    address_line_2: Optional[str] = None
+    residence_address_1: Optional[str] = None
+    residence_address_2: Optional[str] = None
     postal_code: Optional[str] = None
     city: Optional[str] = None
     province: Optional[str] = None
