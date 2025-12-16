@@ -18,7 +18,15 @@ from app.models.responses.card_responses import CardResponse
 
 router = APIRouter(prefix="/card", tags=["Card"])
 
-@router.post("/create", response_model=CardResponse, status_code=201)
+@router.post("/create", response_model=CardResponse, status_code=201,
+             summary="Create a new card",
+             description="Creates a new debit or credit card for the specified account. Requires authentication.",
+             responses={
+                 201: {"description": "Card created successfully", "model": CardResponse},
+                 400: {"description": "Invalid request data"},
+                 401: {"description": "Unauthorized"},
+                 503: {"description": "Card service unavailable"}
+             })
 async def bff_create_card(
     req: CardCreateRequest,
     token: dict = Depends(get_jwt_from_request)
@@ -30,7 +38,14 @@ async def bff_create_card(
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Card service unavailable")
 
-@router.get("/getByUser/{user_id}", response_model=list[CardResponse])
+@router.get("/getByUser/{user_id}", response_model=list[CardResponse],
+            summary="Get user cards",
+            description="Retrieves all cards associated with the specified user ID. Requires authentication.",
+            responses={
+                200: {"description": "Cards retrieved successfully", "model": list[CardResponse]},
+                401: {"description": "Unauthorized"},
+                503: {"description": "Card service unavailable"}
+            })
 async def bff_get_cards(user_id: int, token: dict = Depends(get_jwt_from_request)):
     try:
         return await get_cards_by_user(user_id, token)
@@ -39,7 +54,16 @@ async def bff_get_cards(user_id: int, token: dict = Depends(get_jwt_from_request
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Card service unavailable")
 
-@router.patch("/update/{card_id}", response_model=CardResponse)
+@router.patch("/update/{card_id}", response_model=CardResponse,
+              summary="Update card details",
+              description="Updates the details of an existing card (e.g., status, limits). Requires authentication.",
+              responses={
+                  200: {"description": "Card updated successfully", "model": CardResponse},
+                  400: {"description": "Invalid request data"},
+                  401: {"description": "Unauthorized"},
+                  404: {"description": "Card not found"},
+                  503: {"description": "Card service unavailable"}
+              })
 async def bff_update_card(
     card_id:int,
     req: CardUpdateRequest,

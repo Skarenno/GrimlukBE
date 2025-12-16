@@ -7,16 +7,25 @@ from app.routers.accounts_router import router as account_router
 from app.routers.transaction_router import router as transaction_router
 
 app = FastAPI(
-    title="Banking BFF",
-    description="Backend-for-Frontend for account, card, user, and transaction services",
+    title="Grimluk Banking BFF API",
+    description="Backend-for-Frontend service providing unified access to account, card, user, and transaction management in the Grimluk Finance and Banking system. This API aggregates multiple microservices and provides a consistent interface for frontend applications.",
     version="1.0.0",
+    contact={
+        "name": "Grimluk Development Team",
+        "email": "dev@grimluk.com",
+        "url": "https://grimluk.com"
+    },
+    license_info={
+        "name": "Proprietary",
+        "url": "https://grimluk.com/license"
+    }
 )
 
 register_exception_handlers(app)
 
-@app.get("/health")
+@app.get("/health", summary="Health check", description="Check if the BFF service is running and healthy.")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "service": "BFF", "version": "1.0.0"}
 
 
 

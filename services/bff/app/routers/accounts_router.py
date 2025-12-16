@@ -23,7 +23,15 @@ from app.models.responses.account_responses import (
 
 router = APIRouter(prefix="/account", tags=["Account"])
 
-@router.post("/create", response_model=AccountResponse, status_code=201)
+@router.post("/create", response_model=AccountResponse, status_code=201,
+             summary="Create a new account",
+             description="Creates a new bank account for the specified user with the provided details. Requires authentication.",
+             responses={
+                 201: {"description": "Account created successfully", "model": AccountResponse},
+                 400: {"description": "Invalid request data"},
+                 401: {"description": "Unauthorized"},
+                 503: {"description": "Account service unavailable"}
+             })
 async def bff_create_account(
     req: AccountCreateRequest,
     token: str = Depends(get_jwt_from_request)
@@ -35,7 +43,15 @@ async def bff_create_account(
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Account service unavailable")
 
-@router.get("/getAccounts/{user_id}", response_model=list[AccountResponse])
+@router.get("/getAccounts/{user_id}", response_model=list[AccountResponse],
+            summary="Get user accounts",
+            description="Retrieves all accounts associated with the specified user ID. Requires authentication and user verification.",
+            responses={
+                200: {"description": "Accounts retrieved successfully", "model": list[AccountResponse]},
+                401: {"description": "Unauthorized"},
+                404: {"description": "User not found"},
+                503: {"description": "Account service unavailable"}
+            })
 async def bff_get_accounts(
     user_id: int,
     token: str = Depends(get_jwt_from_request)
@@ -49,7 +65,14 @@ async def bff_get_accounts(
         raise HTTPException(503, "Account service unavailable")
 
 
-@router.get("/getAccountTypes", response_model=list[AccountTypeResponse])
+@router.get("/getAccountTypes", response_model=list[AccountTypeResponse],
+            summary="Get available account types",
+            description="Retrieves a list of all available account types in the system. Requires authentication.",
+            responses={
+                200: {"description": "Account types retrieved successfully", "model": list[AccountTypeResponse]},
+                401: {"description": "Unauthorized"},
+                503: {"description": "Account service unavailable"}
+            })
 async def bff_get_account_types( token: str = Depends(get_jwt_from_request)):
     try:
         return await get_account_types(token=token)
@@ -58,7 +81,14 @@ async def bff_get_account_types( token: str = Depends(get_jwt_from_request)):
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Account service unavailable")
 
-@router.get("/getBranchCodes", response_model=list[BranchCodeResponse])
+@router.get("/getBranchCodes", response_model=list[BranchCodeResponse],
+            summary="Get available branch codes",
+            description="Retrieves a list of all available branch codes for account creation. Requires authentication.",
+            responses={
+                200: {"description": "Branch codes retrieved successfully", "model": list[BranchCodeResponse]},
+                401: {"description": "Unauthorized"},
+                503: {"description": "Account service unavailable"}
+            })
 async def bff_get_branch_codes(token: str = Depends(get_jwt_from_request)):
     try:
         return await get_branch_codes(token=token)
@@ -67,7 +97,16 @@ async def bff_get_branch_codes(token: str = Depends(get_jwt_from_request)):
     except MicroserviceUnavailableError:
         raise HTTPException(503, "Account service unavailable")
 
-@router.post("/delete", response_model=AccountResponse)
+@router.post("/delete", response_model=AccountResponse,
+             summary="Delete an account",
+             description="Deletes the specified account. Optionally transfers remaining balance to another account. Requires authentication and user verification.",
+             responses={
+                 200: {"description": "Account deleted successfully", "model": AccountResponse},
+                 400: {"description": "Invalid request data"},
+                 401: {"description": "Unauthorized"},
+                 404: {"description": "Account or user not found"},
+                 503: {"description": "Account service unavailable"}
+             })
 async def bff_delete_account(
     req: DeleteAccountRequest,
     token: str = Depends(get_jwt_from_request)
