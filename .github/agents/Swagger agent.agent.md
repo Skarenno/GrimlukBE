@@ -51,3 +51,7 @@ Use the correct log level:
 - Start messages with a verb (e.g., *Retrieved*, *Failed to update*)
 - Avoid filler words like “some”, “stuff”, or “something”
 - Be concise but informative
+
+### Structure
+Project architecture is in microservices. The services fodler contains the modules, each module is a service. 
+Each service has a routers folder where there are the api declarations, later loaded in the main.py

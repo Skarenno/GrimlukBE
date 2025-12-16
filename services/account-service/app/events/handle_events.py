@@ -1,6 +1,7 @@
 from app.events.handle_transaction_events import handle_transaction_pending, handle_rollback_blocking
 import logging
 from app.kafka.topics import TRANSACTION_PENDING, ROLLBACK_ACCOUNT_BLOCK
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 

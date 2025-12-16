@@ -7,6 +7,7 @@ class UserInfoResponse(BaseModel):
     id: int
     username: str
     
+    tax_code: str = Field(alias="tax_code")
     email: Optional[str] = Field(None, alias="mail")
     first_name: Optional[str] = Field(None, alias="name")
     last_name: Optional[str] = Field(None, alias="surname")
